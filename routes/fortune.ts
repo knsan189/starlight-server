@@ -21,6 +21,7 @@ function shuffleFortuneArray(): Promise<void> {
     connection.query(
       "SELECT COUNT(*) AS count FROM Fortune",
       (error, result) => {
+        console.log(result);
         const { count } = result[0];
         for (let i = 1; i <= count; i++) {
           fortuneIndexArray.push(i);

@@ -6,6 +6,7 @@ import logger from "morgan";
 import indexRouter from "./routes/index.js";
 import islandRouter from "./routes/island.js";
 import fortuneRouter from "./routes/fortune.js";
+import messageRouter from "./routes/message.js";
 import fs from "fs";
 
 import { fileURLToPath } from "url";
@@ -37,6 +38,7 @@ app.use(express.static(path.join(__dirname, "public")));
 app.use("/", indexRouter);
 app.use("/api/island*", islandRouter);
 app.use("/api/fortune*", fortuneRouter);
+app.use("/api/message*", messageRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

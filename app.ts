@@ -7,6 +7,7 @@ import logger from "morgan";
 import indexRouter from "./src/routes/index.js";
 import islandRouter from "./src/routes/island.js";
 import fortuneRouter from "./src/routes/fortune.js";
+import messageRouter from "./src/routes/message.js";
 import fs from "fs";
 
 const app = express();

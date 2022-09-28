@@ -25,9 +25,9 @@ interface MessageData {
 const logger = log4js.getLogger("message");
 
 router.post("/", (req, res) => {
-  const messageData: MessageData = req.body;
+  const { msg, room, sender, isGroupChat }: MessageData = req.body;
   logger.level = "debug";
-  logger.info(messageData.msg);
+  logger.info(`${sender} : ${msg}`);
   res.send("success");
 });
 

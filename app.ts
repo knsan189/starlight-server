@@ -1,4 +1,5 @@
 import { fileURLToPath } from "url";
+import log4js from "log4js";
 import createError from "http-errors";
 import express from "express";
 import path from "path";
@@ -15,6 +16,8 @@ const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 // view engine setup
+
+log4js.configure(path.join(__dirname, "log4js.json"));
 
 app.set("views", path.join(__dirname, "src/views"));
 app.set("view engine", "pug");
@@ -45,11 +48,15 @@ app.use(function (req, res, next) {
 });
 
 // error handler
+
+const log = log4js.getLogger();
+
 app.use(function (err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get("env") === "development" ? err : {};
 
+  log.error(err);
   // render the error page
   res.status(err.status || 500);
   res.render("error");

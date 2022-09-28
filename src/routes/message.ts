@@ -33,6 +33,10 @@ router.post("/", (req, res) => {
     status: "ok",
   };
 
+  if (msg.indexOf("/메세지")) {
+    response.reply = msg.replace("/메세지", "").trim();
+  }
+
   res.status(200).send(response);
 });
 

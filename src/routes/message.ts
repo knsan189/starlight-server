@@ -28,7 +28,12 @@ router.post("/", (req, res) => {
   const { msg, room, sender, isGroupChat }: MessageData = req.body;
   logger.level = "debug";
   logger.info(`${sender} : ${msg}`);
-  res.send("success");
+
+  const response: MessageResponse = {
+    status: "ok",
+  };
+
+  res.status(200).send(response);
 });
 
 export default router;

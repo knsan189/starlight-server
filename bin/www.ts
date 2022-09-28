@@ -9,14 +9,14 @@ import Debug from "debug";
 import * as http from "http";
 import process from "process";
 
-const debug = Debug("gis-node-server:server");
-process.title = "gis-node-server";
+const debug = Debug("starlight:server");
+process.title = "starlight-server";
 
 /**
  * Get port from environment and store in Express.
  */
 
-const port = normalizePort(process.env.PORT || "3003");
+const port = normalizePort(process.env.PORT || "8080");
 app.set("port", port);
 
 /**

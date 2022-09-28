@@ -1,14 +1,13 @@
+import { fileURLToPath } from "url";
 import createError from "http-errors";
 import express from "express";
 import path from "path";
 import cookieParser from "cookie-parser";
 import logger from "morgan";
-import indexRouter from "./routes/index.js";
-import islandRouter from "./routes/island.js";
-import fortuneRouter from "./routes/fortune.js";
+import indexRouter from "./src/routes/index.js";
+import islandRouter from "./src/routes/island.js";
+import fortuneRouter from "./src/routes/fortune.js";
 import fs from "fs";
-
-import { fileURLToPath } from "url";
 
 const app = express();
 
@@ -16,7 +15,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 // view engine setup
 
-app.set("views", path.join(__dirname, "views"));
+app.set("views", path.join(__dirname, "src/views"));
 app.set("view engine", "pug");
 
 if (process.env.NODE_ENV === "production") {

@@ -1,4 +1,5 @@
 import { fileURLToPath } from "url";
+import fs from "fs";
 import log4js from "log4js";
 import createError from "http-errors";
 import express from "express";
@@ -9,13 +10,12 @@ import indexRouter from "./src/routes/index.js";
 import islandRouter from "./src/routes/island.js";
 import fortuneRouter from "./src/routes/fortune.js";
 import messageRouter from "./src/routes/message.js";
-import fs from "fs";
+import membersRouter from "./src/routes/members.js";
+import raidsRouter from "./src/routes/raids.js";
 
 const app = express();
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-// view engine setup
 
 log4js.configure(path.join(__dirname, "log4js.json"));
 
@@ -41,6 +41,8 @@ app.use("/", indexRouter);
 app.use("/api/island*", islandRouter);
 app.use("/api/fortune*", fortuneRouter);
 app.use("/api/message*", messageRouter);
+app.use("/api/members*", membersRouter);
+app.use("/api/raid", raidsRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

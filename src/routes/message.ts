@@ -1,6 +1,7 @@
 import { Router } from "express";
 import log4js from "log4js";
 import path from "path";
+import { MessageResponse } from "../@types/message";
 
 const router = Router();
 

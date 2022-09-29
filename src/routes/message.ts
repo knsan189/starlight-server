@@ -81,7 +81,7 @@ router.post("/", async (req, res) => {
         const response: MessageResponse = {
           status: "ok",
           reply: data.fortune.format(sender),
-          secondReply: data.msg.format(sender),
+          secondReply: data.msg?.format(sender),
         };
         fortuneSet.add(sender);
         res.status(200).send(response);

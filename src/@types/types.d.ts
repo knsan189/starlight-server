@@ -10,7 +10,7 @@ interface Content {
 
 export interface Fortune {
   id: number;
-  msg: string | null;
+  msg?: string | null;
   fortune: string;
 }
 

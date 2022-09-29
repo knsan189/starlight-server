@@ -30,12 +30,17 @@ router.post("/", (req, res) => {
   logger.level = "debug";
   logger.info(`${sender} : ${msg}`);
 
-  const response: MessageResponse = {
+  let response: MessageResponse = {
     status: "ok",
   };
 
   if (msg.indexOf("/메세지") === 0) {
-    response.reply = msg.replace("/메세지", "").trim();
+    response = {
+      ...response,
+      reply: msg.replace("/메세지", "").trim(),
+      secondReply: "5초후 답장 테스트",
+      delayTime: 5000,
+    };
   }
 
   res.status(200).send(response);

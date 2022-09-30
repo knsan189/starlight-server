@@ -73,7 +73,7 @@ router.post("/", async (req, res) => {
 
       const index = fortuneIndexArray.shift();
 
-      if (fortuneSet.has(sender)) {
+      if (fortuneSet.has(parsedSender)) {
         const response: MessageResponse = {
           status: "ok",
           reply: "운세는 하루에 한번만 사용 하실수 있습니다.",
@@ -87,10 +87,10 @@ router.post("/", async (req, res) => {
           const data = result[0];
           const response: MessageResponse = {
             status: "ok",
-            reply: data.fortune.format(sender),
-            secondReply: data.msg?.format(sender),
+            reply: data.fortune.format(parsedSender),
+            secondReply: data.msg?.format(parsedSender),
           };
-          fortuneSet.add(sender);
+          fortuneSet.add(parsedSender);
           res.status(200).send(response);
         }
       );

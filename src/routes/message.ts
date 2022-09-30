@@ -40,57 +40,65 @@ function shuffleFortuneArray(): Promise<void> {
 }
 
 router.post("/", async (req, res) => {
-  const { msg, room, sender, isGroupChat }: MessageRequest = req.body;
-  logger.level = "debug";
-  logger.info(`${sender} : ${msg}`);
+  try {
+    const { msg, room, sender, isGroupChat }: MessageRequest = req.body;
+    let parsedSender = sender.split("/")[0].trim();
 
-  if (msg.indexOf("/메시지") === 0) {
-    const response: MessageResponse = {
-      status: "ok",
-      reply: msg.replace("/메세지", "").trim(),
-      secondReply: "5초후 답장 테스트",
-      delayTime: 5000,
-    };
-    return res.status(200).send(response);
-  }
-
-  if (msg === "/운세") {
-    if (
-      !fortuneIndexArray.length ||
-      timeStamp.getDate() !== new Date().getDate()
-    ) {
-      await shuffleFortuneArray();
-      timeStamp = new Date();
-      fortuneSet.clear();
+    if (parsedSender.length > 2) {
+      parsedSender = parsedSender.substring(-2);
     }
 
-    const index = fortuneIndexArray.shift();
+    logger.level = "debug";
+    logger.info(`${sender} : ${msg}`);
 
-    if (fortuneSet.has(sender)) {
+    if (msg.indexOf("/메시지") === 0) {
       const response: MessageResponse = {
         status: "ok",
-        reply: "운세는 하루에 한번만 사용 하실수 있습니다.",
+        reply: msg.replace("/메세지", "").trim(),
+        secondReply: "5초후 답장 테스트",
+        delayTime: 5000,
       };
-      return res.send(response);
+      return res.status(200).send(response);
     }
 
-    connection.query(
-      `SELECT * FROM Fortune where id=${index}`,
-      (err, result: Fortune[]) => {
-        const data = result[0];
+    if (msg === "/운세") {
+      if (
+        !fortuneIndexArray.length ||
+        timeStamp.getDate() !== new Date().getDate()
+      ) {
+        await shuffleFortuneArray();
+        timeStamp = new Date();
+        fortuneSet.clear();
+      }
+
+      const index = fortuneIndexArray.shift();
+
+      if (fortuneSet.has(sender)) {
         const response: MessageResponse = {
           status: "ok",
-          reply: data.fortune.format(sender),
-          secondReply: data.msg?.format(sender),
+          reply: "운세는 하루에 한번만 사용 하실수 있습니다.",
         };
-        fortuneSet.add(sender);
-        res.status(200).send(response);
+        return res.send(response);
       }
-    );
-    return;
-  }
 
-  return res.send({ status: "ok" });
+      connection.query(
+        `SELECT * FROM Fortune where id=${index}`,
+        (err, result: Fortune[]) => {
+          const data = result[0];
+          const response: MessageResponse = {
+            status: "ok",
+            reply: data.fortune.format(sender),
+            secondReply: data.msg?.format(sender),
+          };
+          fortuneSet.add(sender);
+          res.status(200).send(response);
+        }
+      );
+      return;
+    }
+  } catch (error) {
+    return res.send({ status: "error", reply: "에러났어요 ㅠ" + error });
+  }
 });
 
 export default router;

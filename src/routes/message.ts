@@ -1,10 +1,11 @@
 import { Router } from "express";
 import pkg from "lodash";
 import log4js from "log4js";
+import { PoolConnection } from "mysql";
 import { getConnection } from "../config/db.config.js";
 import { MessageRequest, MessageResponse } from "../@types/message";
 import { Fortune } from "../@types/types";
-import { PoolConnection } from "mysql";
+import userScraper from "../utils/userScraper.js";
 
 const { shuffle } = pkg;
 const router = Router();
@@ -89,6 +90,7 @@ router.post("/", async (req, res) => {
         connection.query(
           `SELECT * FROM Fortune where id=${index}`,
           (err, result: Fortune[]) => {
+            if (err) throw new Error(err.message);
             const data = result[0];
             const response: MessageResponse = {
               status: "ok",
@@ -103,6 +105,14 @@ router.post("/", async (req, res) => {
       });
       return;
     }
+
+    if (msg.indexOf("/유저") === 0) {
+      const nickname = msg.replace("/유저", "").trim();
+      const userData = await userScraper(nickname);
+      console.log(userData);
+    }
+
+    return res.send("ok");
   } catch (error) {
     return res.send({ status: "error", reply: "에러났어요 ㅠ" + error });
   }

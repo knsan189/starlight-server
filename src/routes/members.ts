@@ -39,25 +39,20 @@ router.post("/", (req, res) => {
 
   getConnection((connection) => {
     connection.query(checkSql, (error, result) => {
-      if (error) {
-        throw new Error(error.message);
-      }
-      if (result.length && result) {
-        res.status(400).send("이미 등록되어있는 닉네임입니다.");
-        return;
-      }
-      connection.query(sql, member, (error) => {
-        if (error) {
-          throw new Error(error.message);
-        }
-        connection.query(checkSql, (error, result) => {
-          if (error) {
-            throw new Error(error.message);
-          }
-          const [data] = result;
-          res.send({ ...data, tags: JSON.parse(data.tags) });
+      try {
+        if (error) throw new Error(error.message);
+        if (result?.length) throw new Error("이미 등록되어있는 닉네임입니다.");
+        connection.query(sql, member, (error) => {
+          if (error) throw new Error(error.message);
+          connection.query(checkSql, (error, result) => {
+            if (error) throw new Error(error.message);
+            const [data] = result;
+            res.send({ ...data, tags: JSON.parse(data.tags) });
+          });
         });
-      });
+      } catch (error) {
+        res.status(400).send(error);
+      }
     });
     connection.release();
   });

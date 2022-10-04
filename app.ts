@@ -6,6 +6,7 @@ import express from "express";
 import path from "path";
 import cookieParser from "cookie-parser";
 import logger from "morgan";
+import requestIp from "request-ip";
 import indexRouter from "./src/routes/index.js";
 import islandRouter from "./src/routes/island.js";
 import messageRouter from "./src/routes/message.js";
@@ -21,15 +22,13 @@ log4js.configure(path.join(__dirname, "log4js.json"));
 app.set("views", path.join(__dirname, "src/views"));
 app.set("view engine", "pug");
 
-if (process.env.NODE_ENV === "production") {
-  app.use(
-    logger("combined", {
-      stream: fs.createWriteStream(`app.log`, { flags: "w" }),
-    })
-  );
-} else {
-  app.use(logger("dev"));
-}
+app.use(requestIp.mw());
+app.use((req, res, next) => {
+  const ip = req.clientIp;
+  console.log(`Request From : ${ip}`);
+  next();
+});
+app.use(logger("dev"));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));

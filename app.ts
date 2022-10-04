@@ -8,7 +8,6 @@ import cookieParser from "cookie-parser";
 import logger from "morgan";
 import indexRouter from "./src/routes/index.js";
 import islandRouter from "./src/routes/island.js";
-import fortuneRouter from "./src/routes/fortune.js";
 import messageRouter from "./src/routes/message.js";
 import membersRouter from "./src/routes/members.js";
 import raidsRouter from "./src/routes/raids.js";
@@ -39,7 +38,6 @@ app.use(express.static(path.join(__dirname, "public")));
 
 app.use("/", indexRouter);
 app.use("/api/island*", islandRouter);
-app.use("/api/fortune*", fortuneRouter);
 app.use("/api/message*", messageRouter);
 app.use("/api/members*", membersRouter);
 app.use("/api/raid", raidsRouter);
@@ -51,14 +49,11 @@ app.use(function (req, res, next) {
 
 // error handler
 
-const log = log4js.getLogger();
-
 app.use(function (err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;
   res.locals.error = req.app.get("env") === "development" ? err : {};
 
-  log.error(err);
   // render the error page
   res.status(err.status || 500);
   res.render("error");

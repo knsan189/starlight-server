@@ -1,9 +1,10 @@
 import { Router } from "express";
 import pkg from "lodash";
 import log4js from "log4js";
-import connection from "../db.js";
+import { getConnection } from "../db.js";
 import { MessageRequest, MessageResponse } from "../@types/message";
 import { Fortune } from "../@types/types";
+import { PoolConnection } from "mysql";
 
 const { shuffle } = pkg;
 const router = Router();
@@ -21,21 +22,24 @@ String.prototype.format = function (...args: any[]) {
 
 function shuffleFortuneArray(): Promise<void> {
   return new Promise((resolve, reject) => {
-    connection.query(
-      "SELECT COUNT(*) AS count FROM Fortune",
-      (error, result) => {
-        try {
-          const { count } = result[0];
-          for (let i = 1; i <= count; i++) {
-            fortuneIndexArray.push(i);
+    getConnection((connection: PoolConnection) => {
+      connection.query(
+        "SELECT COUNT(*) AS count FROM Fortune",
+        (error, result) => {
+          try {
+            const { count } = result[0];
+            for (let i = 1; i <= count; i++) {
+              fortuneIndexArray.push(i);
+            }
+            fortuneIndexArray = shuffle(fortuneIndexArray);
+            resolve();
+          } catch (err) {
+            reject(error);
           }
-          fortuneIndexArray = shuffle(fortuneIndexArray);
-          resolve();
-        } catch (err) {
-          reject(error);
         }
-      }
-    );
+      );
+      connection.release();
+    });
   });
 }
 
@@ -81,19 +85,22 @@ router.post("/", async (req, res) => {
         return res.send(response);
       }
 
-      connection.query(
-        `SELECT * FROM Fortune where id=${index}`,
-        (err, result: Fortune[]) => {
-          const data = result[0];
-          const response: MessageResponse = {
-            status: "ok",
-            reply: data.fortune.format(parsedSender),
-            secondReply: data.msg?.format(parsedSender),
-          };
-          fortuneSet.add(parsedSender);
-          res.status(200).send(response);
-        }
-      );
+      getConnection((connection: PoolConnection) => {
+        connection.query(
+          `SELECT * FROM Fortune where id=${index}`,
+          (err, result: Fortune[]) => {
+            const data = result[0];
+            const response: MessageResponse = {
+              status: "ok",
+              reply: data.fortune.format(parsedSender),
+              secondReply: data.msg?.format(parsedSender),
+            };
+            fortuneSet.add(parsedSender);
+            res.status(200).send(response);
+          }
+        );
+        connection.release();
+      });
       return;
     }
   } catch (error) {

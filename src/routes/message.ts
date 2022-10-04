@@ -1,7 +1,7 @@
 import { Router } from "express";
 import pkg from "lodash";
 import log4js from "log4js";
-import { getConnection } from "../db.js";
+import { getConnection } from "../config/db.config.js";
 import { MessageRequest, MessageResponse } from "../@types/message";
 import { Fortune } from "../@types/types";
 import { PoolConnection } from "mysql";

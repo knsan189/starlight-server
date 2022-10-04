@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { getConnection } from "../db.js";
+import { getConnection } from "../config/db.config.js";
 
 const router = Router();
 
@@ -8,12 +8,13 @@ router.get("/", (req, res) => {
   const sql = "SELECT * FROM Raids WHERE id=?";
   getConnection((connection) => {
     connection.query(sql, id, (err, result, fields) => {
-      if (err) {
-        res.status(400).send("bad request");
-        return;
+      try {
+        if (err) throw new Error(err.message);
+        const [data] = result;
+        res.send({ ...data, parties: JSON.parse(data.parties) });
+      } catch (error) {
+        res.status(500).send(error);
       }
-      const [data] = result;
-      res.send({ ...data, parties: JSON.parse(data.parties) });
     });
     connection.release();
   });

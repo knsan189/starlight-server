@@ -1,5 +1,5 @@
 import { fileURLToPath } from "url";
-import fs from "fs";
+import cors from "cors";
 import log4js from "log4js";
 import createError from "http-errors";
 import express from "express";
@@ -30,6 +30,7 @@ app.use((req, res, next) => {
 });
 app.use(logger("dev"));
 
+app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());

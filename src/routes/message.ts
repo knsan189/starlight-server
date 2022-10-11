@@ -96,6 +96,7 @@ router.post("/", async (req, res) => {
               status: "ok",
               reply: data.fortune.format(parsedSender),
               secondReply: data.msg?.format(parsedSender),
+              delayTime: data.delayTime,
             };
             fortuneSet.add(parsedSender);
             res.status(200).send(response);

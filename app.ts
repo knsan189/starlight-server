@@ -12,6 +12,7 @@ import islandRouter from "./src/routes/island.js";
 import messageRouter from "./src/routes/message.js";
 import membersRouter from "./src/routes/members.js";
 import raidsRouter from "./src/routes/raids.js";
+import FortuneRouter from "./src/routes/fortune.js";
 
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
@@ -41,6 +42,7 @@ app.use("/api/island*", islandRouter);
 app.use("/api/message*", messageRouter);
 app.use("/api/members*", membersRouter);
 app.use("/api/raid", raidsRouter);
+app.use("/api/fortune", FortuneRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

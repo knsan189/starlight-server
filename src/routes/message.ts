@@ -115,6 +115,7 @@ router.post("/", async (req, res) => {
 
     return res.send("ok");
   } catch (error) {
+    console.log(error);
     return res.send({ status: "error", reply: "에러났어요 ㅠ" + error });
   }
 });

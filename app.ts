@@ -37,12 +37,12 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
-app.use("/", indexRouter);
 app.use("/api/island*", islandRouter);
 app.use("/api/message*", messageRouter);
 app.use("/api/members*", membersRouter);
 app.use("/api/raid", raidsRouter);
 app.use("/api/fortune", FortuneRouter);
+app.use("*", indexRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

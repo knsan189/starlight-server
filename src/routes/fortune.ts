@@ -10,7 +10,9 @@ type Params = {
 
 type ResBody = {};
 
-type ReqBody = {};
+type ReqBody = {
+  fortune: Fortune;
+};
 
 type ReqQuery = {
   size: number;
@@ -42,10 +44,10 @@ FortuneRouter.get(
 
 FortuneRouter.put(
   "/:id",
-  (req: Request<Params, ResBody, Fortune, ReqQuery>, res: Response) => {
+  (req: Request<Params, ResBody, ReqBody, ReqQuery>, res: Response) => {
     try {
       const { id } = req.params;
-      const { fortune, delayTime, msg } = req.body;
+      const { fortune, delayTime, msg } = req.body.fortune;
       const sql = "UPDATE Fortune SET fortune=?, msg=?, delayTime=? WHERE id=?";
       const values = [fortune, msg, delayTime, id];
 

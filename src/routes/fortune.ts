@@ -4,9 +4,14 @@ import { getConnection } from "../config/db.config.js";
 
 const FortuneRouter = Router();
 
-type Params = {};
+type Params = {
+  id: number;
+};
+
 type ResBody = {};
+
 type ReqBody = {};
+
 type ReqQuery = {
   size: number;
   page: number;
@@ -26,6 +31,28 @@ FortuneRouter.get(
         connection.query(sql, (error, result: Fortune[]) => {
           if (error) throw new Error(error.message);
           res.send(result);
+        });
+        connection.release();
+      });
+    } catch (err) {
+      res.status(500).send(err);
+    }
+  }
+);
+
+FortuneRouter.put(
+  "/:id",
+  (req: Request<Params, ResBody, Fortune, ReqQuery>, res: Response) => {
+    try {
+      const { id } = req.params;
+      const { fortune, delayTime, msg } = req.body;
+      const sql = "UPDATE Fortune SET fortune=?, msg=?, delayTime=? WHERE id=?";
+      const values = [fortune, msg, delayTime, id];
+
+      getConnection((connection) => {
+        connection.query(sql, values, (error, result) => {
+          if (error) throw new Error(error.message);
+          res.send("ok");
         });
         connection.release();
       });

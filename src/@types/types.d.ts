@@ -42,6 +42,13 @@ export interface DiscordHistory {
   type: "join" | "leave";
 }
 
+export interface DiscordMember {
+  nickname: string;
+  id: number;
+  lastJoinedTime: Date;
+  lastLeaveTime?: Date;
+}
+
 declare global {
   interface String {
     format: (...args: any) => string;

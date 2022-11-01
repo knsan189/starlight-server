@@ -1,14 +1,14 @@
 import { Router } from "express";
 import pkg from "lodash";
 import log4js from "log4js";
-import { format, formatDistanceToNow } from "date-fns";
-import { ko } from "date-fns/locale";
+import { formatDistanceToNow } from "date-fns";
+import ko from "date-fns/locale/ko/index.js";
+import asciifyImage from "asciify-image";
 import { PoolConnection } from "mysql";
 import { getConnection } from "../config/db.config.js";
 import { MessageRequest, MessageResponse } from "../@types/message";
 import { DiscordMember, Fortune } from "../@types/types";
 import userScraper from "../utils/userScraper.js";
-import asciifyImage from "asciify-image";
 import HistoryService from "../services/history.js";
 import MemberService from "../services/member.js";
 

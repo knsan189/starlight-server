@@ -125,30 +125,29 @@ router.post("/", async (req, res) => {
       });
     }
 
-    if (msg.includes("별빛")) {
-      if (msg.includes("승호") && msg.includes("언제")) {
-        const histories = await HistoryService.getHistories({
-          nickname: "승호",
-        });
-        const lastIndex = histories.length - 1;
-        const { type, time } = histories[lastIndex];
-        const date = format(new Date(time), "M월 d일 h시 m분");
-        if (type === "join") {
-          res.send({
-            status: "ok",
-            reply: `지금 접속중이신걸요??`,
-            secondReply: `${date}에 접속하셨어용`,
-          });
-          return;
-        }
+    if (msg.includes("승호") && msg.includes("언제")) {
+      const histories = await HistoryService.getHistories({
+        nickname: "승호",
+      });
+      const lastIndex = histories.length - 1;
+      const { type, time } = histories[lastIndex];
+      const date = format(new Date(time), "M월 d일 h시 m분");
+      if (type === "join") {
         res.send({
           status: "ok",
-          reply: `디코 ${date}에 마지막으로 접속하시구`,
-          secondReply: "다시 안오셨어요 ㅠㅠ",
+          reply: `지금 접속중이신걸요?`,
+          secondReply: `${date}에 접속하셨셔서 아직 계십니담. 또 언제 도망가실지는 모르겠지만요`,
         });
         return;
       }
+      res.send({
+        status: "ok",
+        reply: `디코 ${date}에 마지막으로 접속하시구`,
+        secondReply: "다시 안오셨어요 ㅠㅠ",
+      });
+      return;
     }
+
     if (
       msg.includes("디코에") &&
       msg.includes("누구") &&
@@ -187,7 +186,6 @@ router.post("/", async (req, res) => {
         status: "ok",
         reply,
       });
-
       return;
     }
 

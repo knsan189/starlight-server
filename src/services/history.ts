@@ -23,14 +23,21 @@ export default class HistoryService {
     });
   }
 
-  public static async getHistories(request: { nickname: string; date?: Date }) {
+  public static async getHistories(request: {
+    nickname: string;
+    date?: string;
+  }): Promise<DiscordHistory[]> {
     return new Promise((resolve, reject) => {
       (async () => {
         try {
-          let sql = `SELECT * FROM DiscordHistory WHERE nickname='${request.nickname}' LIMIT 10`;
-          if (request.date) sql += `, DATE_FORMAT(${request.date}, '%Y-%m-%d')`;
+          let sql = `SELECT * FROM DiscordHistory WHERE LOCATE('${request.nickname}', nickname)`;
+          if (request.date) {
+            sql += `,DATE_FORMAT(${new Date(request.date)}, '%Y-%m-%d')`;
+          }
+          sql += `LIMIT 10`;
+
           getConnection((connection) => {
-            connection.query(sql, (error, results) => {
+            connection.query(sql, (error, results: DiscordHistory[]) => {
               if (error) throw new Error(error.message);
               resolve(results);
             });

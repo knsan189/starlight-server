@@ -15,21 +15,23 @@ HistoryRouter.post("/", async (req: Request<{}, {}, DiscordHistory>, res) => {
   }
 });
 
-HistoryRouter.get(
-  "/",
-  async (
-    req: Request<{}, {}, {}, { nickname: string; date?: string }>,
-    res
-  ) => {
+interface QueryString {
+  nickname: string;
+  date?: string;
+}
+
+HistoryRouter.get("/", async (req: Request<{}, {}, {}, QueryString>, res) => {
+  try {
     const { nickname, date } = req.query;
-    console.log(nickname);
-    const response = await HistoryService.getHistories({
+    const result = await HistoryService.getHistories({
       nickname,
-      date: date ? new Date(date) : undefined,
+      date,
     });
-    console.log(response);
+    console.log(result);
     res.send("ok");
+  } catch (error) {
+    res.status(500).send(error);
   }
-);
+});
 
 export default HistoryRouter;

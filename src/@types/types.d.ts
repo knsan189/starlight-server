@@ -37,7 +37,7 @@ export interface UserData {
 }
 
 export interface DiscordHistory {
-  time: Date;
+  time: string;
   nickname: string;
   type: "join" | "leave";
 }
@@ -45,7 +45,7 @@ export interface DiscordHistory {
 export interface DiscordMember {
   nickname: string;
   id: number;
-  lastJoinedTime: Date;
+  lastJoinedTime?: Date;
   lastLeaveTime?: Date;
 }
 

@@ -1,7 +1,8 @@
 import { Router } from "express";
 import pkg from "lodash";
 import log4js from "log4js";
-import { format } from "date-fns";
+import { format, formatDistanceToNow } from "date-fns";
+import { ko } from "date-fns/locale";
 import { PoolConnection } from "mysql";
 import { getConnection } from "../config/db.config.js";
 import { MessageRequest, MessageResponse } from "../@types/message";
@@ -131,12 +132,17 @@ router.post("/", async (req, res) => {
       });
       const lastIndex = histories.length - 1;
       const { type, time } = histories[lastIndex];
-      const date = format(new Date(time), "M월 d일 h시 m분");
+
+      const date = formatDistanceToNow(new Date(time), {
+        addSuffix: true,
+        locale: ko,
+      });
+
       if (type === "join") {
         res.send({
           status: "ok",
           reply: `지금 접속중이신걸요?`,
-          secondReply: `${date}에 접속하셨셔서 아직 계십니담. 또 언제 도망가실지는 모르겠지만요`,
+          secondReply: `${date}에 접속하셔서 아직 계십니담. 또 언제 사라지실지는 모르겠지만요`,
         });
         return;
       }

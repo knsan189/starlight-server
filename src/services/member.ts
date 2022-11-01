@@ -6,14 +6,19 @@ export default class MemberService {
     return new Promise((resolve, reject) => {
       (async () => {
         try {
-          if (history.type === "leave") return;
+          const value: Partial<DiscordMember> = { nickname: history.nickname };
+          const date = new Date(history.time);
+
+          if (history.type === "join") {
+            value.lastJoinedTime = date;
+          } else {
+            value.lastLeaveTime = date;
+          }
+
           getConnection((connection) => {
             connection.query(
               "INSERT INTO DiscordMember SET ?",
-              {
-                nickname: history.nickname,
-                lastJoinedTime: new Date(history.time),
-              },
+              value,
               (error) => {
                 if (error) throw new Error(error.message);
                 resolve("success");

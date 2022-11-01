@@ -24,6 +24,7 @@ export default class MemberService {
                 resolve("success");
               }
             );
+            connection.release();
           });
         } catch (err) {
           reject(err);
@@ -46,6 +47,7 @@ export default class MemberService {
                 resolve(results?.[0]);
               }
             );
+            connection.release();
           });
         } catch (err) {
           reject(err);
@@ -70,6 +72,7 @@ export default class MemberService {
               if (error) throw new Error(error.message);
               resolve("success");
             });
+            connection.release();
           });
         } catch (err) {
           reject(err);

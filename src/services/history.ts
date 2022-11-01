@@ -15,6 +15,7 @@ export default class HistoryService {
                 resolve("success");
               }
             );
+            connection.release();
           });
         } catch (err) {
           reject(err);
@@ -41,6 +42,7 @@ export default class HistoryService {
               if (error) throw new Error(error.message);
               resolve(results);
             });
+            connection.release();
           });
         } catch (err) {
           reject(err);

@@ -1,6 +1,6 @@
 import { Request, Response, Router } from "express";
 import { DiscordHistory } from "../@types/types";
-import HistoryService from "../services/historyService.js";
+import HistoryService from "../services/history.js";
 
 const HistoryRouter = Router();
 

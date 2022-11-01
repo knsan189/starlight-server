@@ -6,6 +6,7 @@ import { getConnection } from "../config/db.config.js";
 import { MessageRequest, MessageResponse } from "../@types/message";
 import { Fortune } from "../@types/types";
 import userScraper from "../utils/userScraper.js";
+import asciifyImage from "asciify-image";
 
 const { shuffle } = pkg;
 const router = Router();
@@ -50,7 +51,7 @@ router.post("/", async (req, res) => {
     let parsedSender = sender.split("/")[0].trim();
 
     if (parsedSender.length > 2) {
-      parsedSender = parsedSender.substring(-2);
+      parsedSender = parsedSender.substring(1);
     }
 
     logger.level = "debug";
@@ -110,7 +111,13 @@ router.post("/", async (req, res) => {
     if (msg.indexOf("/유저") === 0) {
       const nickname = msg.replace("/유저", "").trim();
       const userData = await userScraper(nickname);
-      console.log(userData);
+      const response = await asciifyImage(userData.charImg, {
+        color: false,
+        fit: "box",
+        width: 50,
+      });
+
+      console.log(response);
     }
 
     return res.send("ok");

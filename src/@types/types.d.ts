@@ -36,6 +36,12 @@ export interface UserData {
   jewels: Jewel[];
 }
 
+export interface DiscordHistory {
+  time: Date;
+  nickname: string;
+  type: "join" | "leave";
+}
+
 declare global {
   interface String {
     format: (...args: any) => string;

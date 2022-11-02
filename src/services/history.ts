@@ -5,8 +5,8 @@ export default class HistoryService {
   public static async addHistory(history: DiscordHistory) {
     return new Promise((resolve, reject) => {
       (async () => {
-        try {
-          getConnection((connection) => {
+        getConnection((connection) => {
+          try {
             connection.query(
               "INSERT INTO DiscordHistory SET ?",
               { ...history, time: new Date(history.time) },
@@ -15,11 +15,12 @@ export default class HistoryService {
                 resolve("success");
               }
             );
+          } catch (error) {
+            reject(error);
+          } finally {
             connection.release();
-          });
-        } catch (err) {
-          reject(err);
-        }
+          }
+        });
       })();
     });
   }
@@ -30,23 +31,23 @@ export default class HistoryService {
   }): Promise<DiscordHistory[]> {
     return new Promise((resolve, reject) => {
       (async () => {
-        try {
-          let sql = `SELECT * FROM DiscordHistory WHERE LOCATE('${request.nickname}', nickname)`;
-          if (request.date) {
-            sql += `,DATE_FORMAT(${new Date(request.date)}, '%Y-%m-%d')`;
-          }
-          sql += `LIMIT 10`;
-
-          getConnection((connection) => {
+        getConnection((connection) => {
+          try {
+            let sql = `SELECT * FROM DiscordHistory WHERE LOCATE('${request.nickname}', nickname)`;
+            if (request.date) {
+              sql += `,DATE_FORMAT(${new Date(request.date)}, '%Y-%m-%d')`;
+            }
+            sql += `LIMIT 10`;
             connection.query(sql, (error, results: DiscordHistory[]) => {
               if (error) throw new Error(error.message);
               resolve(results);
             });
+          } catch (error) {
+            reject(error);
+          } finally {
             connection.release();
-          });
-        } catch (err) {
-          reject(err);
-        }
+          }
+        });
       })();
     });
   }

@@ -7,8 +7,8 @@ export default class FortuneService {
   public static async getFortune(id: number): Promise<Fortune> {
     return new Promise((resolve, reject) => {
       (async () => {
-        try {
-          getConnection((connection: PoolConnection) => {
+        getConnection((connection: PoolConnection) => {
+          try {
             connection.query(
               `SELECT * FROM Fortune where id=${id}`,
               (err, result: Fortune[]) => {
@@ -17,11 +17,12 @@ export default class FortuneService {
                 resolve(result[0]);
               }
             );
+          } catch (error) {
+            reject(error);
+          } finally {
             connection.release();
-          });
-        } catch (err) {
-          reject(err);
-        }
+          }
+        });
       })();
     });
   }

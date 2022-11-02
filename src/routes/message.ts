@@ -119,6 +119,9 @@ router.post("/", async (req, res) => {
 
     if (msg.includes("승호") && msg.includes("언제")) {
       const member: DiscordMember = await MemberService.getMember("승호");
+
+      if (!member) throw new Error("no user found");
+
       const { lastJoinedTime, lastLeaveTime } = member;
 
       if (

@@ -44,7 +44,6 @@ export default class MemberService {
               `SELECT * FROM DiscordMember WHERE LOCATE('${nickname}', nickname)`,
               (error, results: DiscordMember[]) => {
                 if (error) throw new Error(error.message);
-                if (!results.length) throw new Error("no user found");
                 resolve(results[0]);
               }
             );

@@ -41,10 +41,11 @@ export default class MemberService {
         try {
           getConnection((connection) => {
             connection.query(
-              `SELECT * FROM DiscordMember WHERE nickname='${nickname}'`,
+              `SELECT * FROM DiscordMember WHERE LOCATE('${nickname}', nickname)`,
               (error, results: DiscordMember[]) => {
                 if (error) throw new Error(error.message);
-                resolve(results?.[0]);
+                if (!results.length) throw new Error("no user found");
+                resolve(results[0]);
               }
             );
             connection.release();

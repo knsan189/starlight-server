@@ -11,6 +11,7 @@ import { DiscordMember, Fortune } from "../@types/types";
 import userScraper from "../utils/userScraper.js";
 import HistoryService from "../services/history.js";
 import MemberService from "../services/member.js";
+import FortuneService from "../services/fortune.js";
 
 const { shuffle } = pkg;
 const router = Router();
@@ -55,7 +56,7 @@ function shuffleFortuneArray(): Promise<void> {
 
 router.post("/", async (req, res) => {
   try {
-    const { msg, room, sender, isGroupChat }: MessageRequest = req.body;
+    const { msg, room, sender }: MessageRequest = req.body;
     let parsedSender = getParsedSender(sender);
 
     if (parsedSender.length > 2) {
@@ -72,7 +73,7 @@ router.post("/", async (req, res) => {
         secondReply: "5초후 답장 테스트",
         delayTime: 5000,
       };
-      return res.status(200).send(response);
+      return res.send(response);
     }
 
     if (msg === "/운세") {
@@ -95,25 +96,15 @@ router.post("/", async (req, res) => {
         return res.send(response);
       }
 
-      getConnection((connection: PoolConnection) => {
-        connection.query(
-          `SELECT * FROM Fortune where id=${index}`,
-          (err, result: Fortune[]) => {
-            if (err) throw new Error(err.message);
-            const data = result[0];
-            const response: MessageResponse = {
-              status: "ok",
-              reply: data.fortune.format(parsedSender),
-              secondReply: data.msg?.format(parsedSender),
-              delayTime: data.delayTime,
-            };
-            fortuneSet.add(parsedSender);
-            res.status(200).send(response);
-          }
-        );
-        connection.release();
-      });
-      return;
+      const fortune = await FortuneService.getFortune(index);
+
+      const response: MessageResponse = {
+        status: "ok",
+        reply: fortune.fortune.format(parsedSender),
+        secondReply: fortune.msg?.format(parsedSender),
+        delayTime: fortune.delayTime,
+      };
+      return res.send(response);
     }
 
     if (msg.indexOf("/유저") === 0) {
@@ -127,38 +118,37 @@ router.post("/", async (req, res) => {
     }
 
     if (msg.includes("승호") && msg.includes("언제")) {
-      const histories = await HistoryService.getHistories({
-        nickname: "승호",
-      });
-      const lastIndex = histories.length - 1;
-      const { type, time } = histories[lastIndex];
+      const member: DiscordMember = await MemberService.getMember("승호");
+      const { lastJoinedTime, lastLeaveTime } = member;
 
-      const date = formatDistanceToNow(new Date(time), {
-        addSuffix: true,
-        locale: ko,
-      });
+      if (
+        new Date(lastJoinedTime).getTime() > new Date(lastLeaveTime).getTime()
+      ) {
+        const date = formatDistanceToNow(new Date(lastJoinedTime), {
+          addSuffix: true,
+          locale: ko,
+        });
 
-      if (type === "join") {
-        res.send({
+        return res.send({
           status: "ok",
           reply: `지금 접속중이신걸요?`,
           secondReply: `${date}에 접속하셔서 아직 계십니담. 또 언제 사라지실지는 모르겠지만요`,
         });
-        return;
       }
-      res.send({
+
+      const date = formatDistanceToNow(new Date(lastLeaveTime), {
+        addSuffix: true,
+        locale: ko,
+      });
+
+      return res.send({
         status: "ok",
         reply: `디코 ${date}에 마지막으로 접속하시구`,
         secondReply: "다시 안오셨어요 ㅠㅠ",
       });
-      return;
     }
 
-    if (
-      msg.includes("디코에") &&
-      msg.includes("누구") &&
-      msg.includes("지금")
-    ) {
+    if (msg.includes("디코") && msg.includes("누구") && msg.includes("지금")) {
       const members = await MemberService.getMembers();
       const currentUser: DiscordMember[] = [];
 
@@ -175,11 +165,10 @@ router.post("/", async (req, res) => {
       });
 
       if (currentUser.length === 0) {
-        res.send({
+        return res.send({
           status: "ok",
           reply: `지금 아무도 접속 안하고 있는거 같아요 !`,
         });
-        return;
       }
 
       let reply = "지금 ";
@@ -188,11 +177,11 @@ router.post("/", async (req, res) => {
       });
 
       reply += "접속해 계시는거 같아요 !";
-      res.send({
+
+      return res.send({
         status: "ok",
         reply,
       });
-      return;
     }
 
     return res.send("ok");

@@ -6,7 +6,6 @@ import express from "express";
 import path from "path";
 import cookieParser from "cookie-parser";
 import logger from "morgan";
-import requestIp from "request-ip";
 import indexRouter from "./src/routes/index.js";
 import islandRouter from "./src/routes/island.js";
 import messageRouter from "./src/routes/message.js";
@@ -23,21 +22,12 @@ log4js.configure(path.join(__dirname, "log4js.json"));
 
 app.set("views", path.join(__dirname, "src/views"));
 app.set("view engine", "pug");
-
-app.use(requestIp.mw());
-app.use((req, res, next) => {
-  const ip = req.clientIp;
-  console.log(`Request From : ${ip}`);
-  next();
-});
-app.use(logger("dev"));
-
+app.use(logger(process.env.NODE_ENV !== "production" ? "common" : "dev"));
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
-
 app.use("/api/history", HistoryRouter);
 app.use("/api/island*", islandRouter);
 app.use("/api/message*", messageRouter);

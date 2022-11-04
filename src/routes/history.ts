@@ -4,7 +4,7 @@ import { DiscordHistory, DiscordMember } from "../@types/types";
 import HistoryService from "../services/history.js";
 import MemberService from "../services/member.js";
 
-const logger = log4js.getLogger("message");
+const logger = log4js.getLogger("history");
 
 const HistoryRouter = Router();
 
@@ -37,6 +37,7 @@ HistoryRouter.get("/", async (req: Request<{}, {}, {}, QueryString>, res) => {
     console.log(result);
     res.send("ok");
   } catch (error) {
+    logger.error(error);
     res.status(500).send(error);
   }
 });
@@ -64,19 +65,15 @@ HistoryRouter.post(
             logger.info(
               `오프라인으로 저장되었는데, 온라인 상태인 유저 [${target.nickname}]`
             );
-            promiseArray.push(
-              MemberService.editMember({
-                nickname,
-                type: "join",
-                time,
-              })
-            );
+            const history: DiscordHistory = { nickname, type: "join", time };
+            promiseArray.push(MemberService.editMember(history));
+            promiseArray.push(HistoryService.addHistory(history));
           }
         } else {
-          logger.info(`미등록 유저 [${target.nickname}]`);
-          promiseArray.push(
-            MemberService.addMember({ nickname, type: "join", time })
-          );
+          logger.info(`미등록 유저 [${nickname}]`);
+          const history: DiscordHistory = { nickname, type: "join", time };
+          promiseArray.push(MemberService.addMember(history));
+          promiseArray.push(HistoryService.addHistory(history));
         }
       });
 
@@ -88,16 +85,16 @@ HistoryRouter.post(
           logger.info(
             `온라인으로 저장되었는데 오프라인 상태인 유저 [${member.nickname}]`
           );
-          promiseArray.push(
-            MemberService.editMember({
-              nickname: member.nickname,
-              type: "leave",
-              time,
-            })
-          );
+
+          const history: DiscordHistory = {
+            nickname: member.nickname,
+            type: "leave",
+            time,
+          };
+          promiseArray.push(MemberService.editMember(history));
+          promiseArray.push(HistoryService.addHistory(history));
         }
       });
-
       await Promise.all(promiseArray);
       res.send("ok");
     } catch (error) {

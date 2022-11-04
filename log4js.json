@@ -36,6 +36,10 @@
     "message": {
       "appenders": ["app", "errors", "info"],
       "level": "info"
+    },
+    "history": {
+      "appenders": ["app", "errors", "info"],
+      "level": "info"
     }
   }
 }

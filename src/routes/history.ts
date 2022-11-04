@@ -1,7 +1,10 @@
 import { Request, Response, Router } from "express";
+import log4js from "log4js";
 import { DiscordHistory, DiscordMember } from "../@types/types";
 import HistoryService from "../services/history.js";
 import MemberService from "../services/member.js";
+
+const logger = log4js.getLogger("message");
 
 const HistoryRouter = Router();
 
@@ -54,14 +57,13 @@ HistoryRouter.post(
       nicknames.forEach((nickname) => {
         const target = dbMembers.find((member) => member.nickname === nickname);
         if (target) {
-          console.log(
-            `오프라인으로 저장되었는데, 온라인 상태인 유저 [${target.nickname}]`
-          );
           const joinTime = new Date(target.lastJoinedTime).getTime();
           const leaveTime = new Date(target.lastLeaveTime).getTime();
-
           // 종료시간이 접속시간보다 큰데, 접속 중인 경우
           if (leaveTime > joinTime) {
+            logger.info(
+              `오프라인으로 저장되었는데, 온라인 상태인 유저 [${target.nickname}]`
+            );
             promiseArray.push(
               MemberService.editMember({
                 nickname,
@@ -71,7 +73,7 @@ HistoryRouter.post(
             );
           }
         } else {
-          console.log(`미등록 유저 [${target.nickname}]`);
+          logger.info(`미등록 유저 [${target.nickname}]`);
           promiseArray.push(
             MemberService.addMember({ nickname, type: "join", time })
           );
@@ -83,7 +85,7 @@ HistoryRouter.post(
         const leaveTime = new Date(member.lastLeaveTime).getTime();
 
         if (joinTime > leaveTime && !nicknames.includes(member.nickname)) {
-          console.log(
+          logger.info(
             `온라인으로 저장되었는데 오프라인 상태인 유저 [${member.nickname}]`
           );
           promiseArray.push(
@@ -100,6 +102,7 @@ HistoryRouter.post(
       res.send("ok");
     } catch (error) {
       res.status(500).send(error);
+      logger.error(error);
     }
   }
 );

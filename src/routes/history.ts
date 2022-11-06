@@ -56,24 +56,28 @@ HistoryRouter.post(
       const time = new Date().toString();
 
       nicknames.forEach((nickname) => {
-        const target = dbMembers.find((member) => member.nickname === nickname);
-        if (target) {
-          const joinTime = new Date(target.lastJoinedTime).getTime();
-          const leaveTime = new Date(target.lastLeaveTime).getTime();
-          // 종료시간이 접속시간보다 큰데, 접속 중인 경우
-          if (leaveTime > joinTime) {
-            logger.info(
-              `오프라인으로 저장되었는데, 온라인 상태인 유저 [${target.nickname}]`
-            );
+        if (nickname) {
+          const target = dbMembers.find(
+            (member) => member.nickname === nickname
+          );
+          if (target) {
+            const joinTime = new Date(target.lastJoinedTime).getTime();
+            const leaveTime = new Date(target.lastLeaveTime).getTime();
+            // 종료시간이 접속시간보다 큰데, 접속 중인 경우
+            if (leaveTime > joinTime) {
+              logger.info(
+                `오프라인으로 저장되었는데, 온라인 상태인 유저 [${target.nickname}]`
+              );
+              const history: DiscordHistory = { nickname, type: "join", time };
+              promiseArray.push(MemberService.editMember(history));
+              promiseArray.push(HistoryService.addHistory(history));
+            }
+          } else {
+            logger.info(`미등록 유저 [${nickname}]`);
             const history: DiscordHistory = { nickname, type: "join", time };
-            promiseArray.push(MemberService.editMember(history));
+            promiseArray.push(MemberService.addMember(history));
             promiseArray.push(HistoryService.addHistory(history));
           }
-        } else {
-          logger.info(`미등록 유저 [${nickname}]`);
-          const history: DiscordHistory = { nickname, type: "join", time };
-          promiseArray.push(MemberService.addMember(history));
-          promiseArray.push(HistoryService.addHistory(history));
         }
       });
 

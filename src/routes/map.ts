@@ -49,8 +49,9 @@ MapRouter.get(
       const { keyword } = req.query;
 
       if (!keyword) {
-        throw new Error("검색어는 최소 2자 이상 보내주셔야 합니다.");
+        return res.status(400).send("검색어를 제대로 입력해주세요.");
       }
+
       const response: AxiosResponse<VworldSearchResponse> = await axios({
         url: "http://api.vworld.kr/req/search",
         method: "GET",

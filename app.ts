@@ -13,6 +13,7 @@ import membersRouter from "./src/routes/members.js";
 import raidsRouter from "./src/routes/raids.js";
 import FortuneRouter from "./src/routes/fortune.js";
 import HistoryRouter from "./src/routes/history.js";
+import MapRouter from "./src/routes/map.js";
 
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
@@ -28,6 +29,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
+app.use("/api/map", MapRouter);
 app.use("/api/history", HistoryRouter);
 app.use("/api/island*", islandRouter);
 app.use("/api/message*", messageRouter);

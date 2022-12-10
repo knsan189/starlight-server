@@ -63,7 +63,7 @@ MapRouter.get(
         },
       });
 
-      return res.send(response.data.response.result);
+      return res.send(response.data.response.result.items);
     } catch (error) {
       return res.status(500).send(error);
     }

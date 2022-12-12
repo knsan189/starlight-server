@@ -34,13 +34,17 @@ interface VworldSearchResponse {
       current: string;
       size: 1;
     };
-    result: {
-      crs: string;
-      type: string;
-      items: Place[];
-    };
+    result?: PlaceResult;
   };
 }
+
+interface PlaceResult {
+  crs: string;
+  type: string;
+  items: Place[];
+}
+
+const searchMap = new Map<string, Place[]>();
 
 MapRouter.get(
   "/search",
@@ -50,6 +54,12 @@ MapRouter.get(
 
       if (!keyword) {
         return res.status(400).send("검색어를 제대로 입력해주세요.");
+      }
+
+      const cached = searchMap.get(keyword);
+
+      if (cached) {
+        return res.send(cached);
       }
 
       const response: AxiosResponse<VworldSearchResponse> = await axios({
@@ -63,10 +73,29 @@ MapRouter.get(
         },
       });
 
-      return res.send(
-        response.data.response.result.items.filter((item) => item.address.road)
-      );
+      if (!response.data.response.result) {
+        return res.send("검색 결과가 없습니다.");
+      }
+
+      const result: Place[] = [];
+      const addressArr = [];
+
+      response.data.response.result.items.forEach((item) => {
+        if (item.address.road && !addressArr.includes(item.address.road)) {
+          result.push(item);
+          addressArr.push(item.address.road);
+        }
+      });
+
+      if (searchMap.size > 100) {
+        searchMap.clear();
+      }
+
+      searchMap.set(keyword, result);
+
+      return res.send(result);
     } catch (error) {
+      console.log(error);
       return res.status(500).send(error);
     }
   }

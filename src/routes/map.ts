@@ -63,7 +63,9 @@ MapRouter.get(
         },
       });
 
-      return res.send(response.data.response.result.items);
+      return res.send(
+        response.data.response.result.items.filter((item) => item.address.road)
+      );
     } catch (error) {
       return res.status(500).send(error);
     }

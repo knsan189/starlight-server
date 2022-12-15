@@ -1,5 +1,6 @@
 import axios, { AxiosResponse } from "axios";
 import { Request, Router } from "express";
+import { getConnection } from "../config/db.config.js";
 
 const MapRouter = Router();
 
@@ -150,6 +151,49 @@ MapRouter.get("/address", async (req: Request<unknown, unknown, unknown, Address
 
     addressMap.set(point, response.data.response.result);
     return res.send(response.data.response.result);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send(error);
+  }
+});
+
+interface StoreRequestBody {
+  northEast: {
+    lat: number;
+    lon: number;
+  };
+  southWest: {
+    lat: number;
+    lon: number;
+  };
+}
+MapRouter.post("/store", async (req: Request<unknown, unknown, StoreRequestBody>, res) => {
+  try {
+    const { northEast, southWest } = req.body;
+    const x1 = southWest.lon;
+    const y1 = southWest.lat;
+    const x2 = northEast.lon;
+    const y2 = northEast.lat;
+
+    const sql =
+      `SELECT * ` +
+      `FROM store ` +
+      `WHERE MBRContains(ST_GeomFromText('Polygon((${x1} ${y1},${x1} ${y2}, ${x2} ${y2}, ${x2} ${y1}, ${x1} ${y1}))'), ST_GeomFromText('Point('+store.lon, store.lat)'))`;
+
+    console.log(sql);
+
+    const response = await new Promise((resolve, reject) => {
+      getConnection((connection) => {
+        connection.query(sql, (error, result) => {
+          if (error) reject(error);
+          console.log(result);
+          resolve(result);
+        });
+        connection.release();
+      });
+    });
+
+    return res.send(response);
   } catch (error) {
     console.log(error);
     return res.status(500).send(error);

@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "set NODE_ENV=development && nodemon --exec ts-node bin/www.ts",
-    "build": "tsc",
+    "build": "tsc && cp -r src/views/ dist/src",
     "start": "set NODE_ENV=production && node dist/bin/www.js"
   },
   "dependencies": {

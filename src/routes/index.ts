@@ -6,7 +6,7 @@ const router = Router();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const isDev = process.env.NODE_ENV.trim() !== "production";
+const isDev = `${process.env.NODE_ENV}`.trim() === "development";
 
 router.get("/", function (req, res) {
   res.sendFile(

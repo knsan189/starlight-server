@@ -3,8 +3,8 @@
     "module": "ESNext",
     "moduleResolution": "Node",
     "allowSyntheticDefaultImports": true,
-    "target": "ESNext",
-    "outDir": "dist"
+    "target": "ESNext"
+    // "outDir": "dist"
   },
   "ts-node": {
     "esm": true

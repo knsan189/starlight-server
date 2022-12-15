@@ -3,18 +3,14 @@ import pkg from "lodash";
 import log4js from "log4js";
 import { formatDistanceToNow } from "date-fns";
 import ko from "date-fns/locale/ko/index.js";
-import asciifyImage from "asciify-image";
-import { PoolConnection } from "mysql";
-import { getConnection } from "../config/db.config.js";
 import { MessageRequest, MessageResponse } from "../@types/message";
-import { DiscordMember, Fortune } from "../@types/types";
+import { DiscordMember } from "../@types/types";
 import userScraper from "../utils/userScraper.js";
-import HistoryService from "../services/history.js";
 import MemberService from "../services/member.js";
 import FortuneService from "../services/fortune.js";
 
 const { shuffle } = pkg;
-const router = Router();
+const MessageRouter = Router();
 const logger = log4js.getLogger("message");
 
 let timeStamp = new Date();
@@ -25,38 +21,23 @@ function getParsedSender(sender: string) {
   return sender.split("/")[0].trim();
 }
 
-String.prototype.format = function (...args: any[]) {
+String.prototype.format = function (...args: string[]) {
   return this.replace(/{([0-9]+)}/g, function (match, index) {
     return typeof args[index] === "undefined" ? match : args[index];
   });
 };
 
-function shuffleFortuneArray(): Promise<void> {
-  return new Promise((resolve, reject) => {
-    getConnection((connection: PoolConnection) => {
-      connection.query(
-        "SELECT COUNT(*) AS count FROM Fortune",
-        (error, result) => {
-          try {
-            const { count } = result[0];
-            for (let i = 1; i <= count; i++) {
-              fortuneIndexArray.push(i);
-            }
-            fortuneIndexArray = shuffle(fortuneIndexArray);
-            resolve();
-          } catch (err) {
-            reject(error);
-          }
-        }
-      );
-      connection.release();
-    });
-  });
+async function shuffleFortuneArray(): Promise<void> {
+  const count = await FortuneService.getCount();
+  for (let i = 1; i <= count; i++) {
+    fortuneIndexArray.push(i);
+  }
+  fortuneIndexArray = shuffle(fortuneIndexArray);
 }
 
-router.post("/", async (req, res) => {
+MessageRouter.post("/", async (req, res) => {
   try {
-    const { msg, room, sender }: MessageRequest = req.body;
+    const { msg, sender }: MessageRequest = req.body;
     let parsedSender = getParsedSender(sender);
 
     if (parsedSender.length > 2) {
@@ -77,10 +58,7 @@ router.post("/", async (req, res) => {
     }
 
     if (msg === "/운세") {
-      if (
-        !fortuneIndexArray.length ||
-        timeStamp.getDate() !== new Date().getDate()
-      ) {
+      if (!fortuneIndexArray.length || timeStamp.getDate() !== new Date().getDate()) {
         await shuffleFortuneArray();
         timeStamp = new Date();
         fortuneSet.clear();
@@ -110,11 +88,6 @@ router.post("/", async (req, res) => {
     if (msg.indexOf("/유저") === 0) {
       const nickname = msg.replace("/유저", "").trim();
       const userData = await userScraper(nickname);
-      const response = await asciifyImage(userData.charImg, {
-        color: false,
-        fit: "box",
-        width: 50,
-      });
     }
 
     if (msg.includes("승호") && msg.includes("언제")) {
@@ -124,9 +97,7 @@ router.post("/", async (req, res) => {
 
       const { lastJoinedTime, lastLeaveTime } = member;
 
-      if (
-        new Date(lastJoinedTime).getTime() > new Date(lastLeaveTime).getTime()
-      ) {
+      if (new Date(lastJoinedTime).getTime() > new Date(lastLeaveTime).getTime()) {
         const date = formatDistanceToNow(new Date(lastJoinedTime), {
           addSuffix: true,
           locale: ko,
@@ -194,4 +165,4 @@ router.post("/", async (req, res) => {
   }
 });
 
-export default router;
+export default MessageRouter;

@@ -17,14 +17,10 @@ export default class MemberService {
             } else {
               value.lastLeaveTime = date;
             }
-            connection.query(
-              "INSERT INTO DiscordMember SET ?",
-              value,
-              (error) => {
-                if (error) throw new Error(error.message);
-                resolve("success");
-              }
-            );
+            connection.query("INSERT INTO DiscordMember SET ?", value, (error) => {
+              if (error) throw new Error(error.message);
+              resolve("success");
+            });
           } catch (error) {
             reject(error);
           } finally {
@@ -35,9 +31,7 @@ export default class MemberService {
     });
   }
 
-  public static async getMember(
-    nickname: DiscordHistory["nickname"]
-  ): Promise<DiscordMember> {
+  public static async getMember(nickname: DiscordHistory["nickname"]): Promise<DiscordMember> {
     return new Promise((resolve, reject) => {
       (async () => {
         getConnection((connection) => {
@@ -47,7 +41,7 @@ export default class MemberService {
               (error, results: DiscordMember[]) => {
                 if (error) throw new Error(error.message);
                 resolve(results[0]);
-              }
+              },
             );
           } catch (error) {
             reject(error);
@@ -90,13 +84,10 @@ export default class MemberService {
       (async () => {
         getConnection((connection) => {
           try {
-            connection.query(
-              `SELECT * FROM DiscordMember`,
-              (error, results: DiscordMember[]) => {
-                if (error) throw new Error(error.message);
-                resolve(results);
-              }
-            );
+            connection.query(`SELECT * FROM DiscordMember`, (error, results: DiscordMember[]) => {
+              if (error) throw new Error(error.message);
+              resolve(results);
+            });
           } catch (error) {
             reject(error);
           } finally {

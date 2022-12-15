@@ -3,10 +3,12 @@
     "module": "ESNext",
     "moduleResolution": "Node",
     "allowSyntheticDefaultImports": true,
-    "target": "ESNext"
+    "target": "ESNext",
+    "outDir": "dist"
   },
   "ts-node": {
     "esm": true
   },
-  "exclude": ["node_modules"]
+  "include": ["src/**/*", "app.ts", "bin/**/*"],
+  "exclude": ["node_modules", "dist"]
 }

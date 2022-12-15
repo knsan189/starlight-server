@@ -6,8 +6,12 @@ const router = Router();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-router.get("/", function (req, res, next) {
-  res.sendFile(path.join(__dirname, "../../public/index.html"));
+const isDev = process.env.NODE_ENV.trim() !== "production";
+
+router.get("/", function (req, res) {
+  res.sendFile(
+    path.join(__dirname, isDev ? "../../public/index.html" : "../../../public/index.html"),
+  );
 });
 
 export default router;

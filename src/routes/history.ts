@@ -8,7 +8,7 @@ const logger = log4js.getLogger("history");
 
 const HistoryRouter = Router();
 
-HistoryRouter.post("/", async (req: Request<{}, {}, DiscordHistory>, res) => {
+HistoryRouter.post("/", async (req: Request<unknown, unknown, DiscordHistory>, res: Response) => {
   try {
     const history = req.body;
     const member = await MemberService.getMember(history.nickname);
@@ -18,10 +18,10 @@ HistoryRouter.post("/", async (req: Request<{}, {}, DiscordHistory>, res) => {
       await MemberService.editMember(history);
     }
     await HistoryService.addHistory(history);
-    res.send("ok");
+    return res.send("ok");
   } catch (error) {
     console.log(error);
-    res.status(500).send(error);
+    return res.status(500).send(error);
   }
 });
 
@@ -30,82 +30,75 @@ interface QueryString {
   date?: string;
 }
 
-HistoryRouter.get("/", async (req: Request<{}, {}, {}, QueryString>, res) => {
-  try {
-    const { nickname, date } = req.query;
-    const result = await HistoryService.getHistories({ nickname, date });
-    console.log(result);
-    res.send("ok");
-  } catch (error) {
-    logger.error(error);
-    res.status(500).send(error);
-  }
-});
+HistoryRouter.get(
+  "/",
+  async (req: Request<unknown, unknown, unknown, QueryString>, res: Response) => {
+    try {
+      const { nickname, date } = req.query;
+      const result = await HistoryService.getHistories({ nickname, date });
+      return res.send(result);
+    } catch (error) {
+      logger.error(error);
+      return res.status(500).send(error);
+    }
+  },
+);
 
 interface SyncRequestBody {
   nicknames: DiscordMember["nickname"][];
 }
 
-HistoryRouter.post(
-  "/sync",
-  async (req: Request<{}, {}, SyncRequestBody>, res) => {
-    try {
-      const { nicknames } = req.body;
-      const dbMembers = await MemberService.getMembers();
-      const promiseArray = [];
-      const time = new Date().toString();
+HistoryRouter.post("/sync", async (req: Request<unknown, unknown, SyncRequestBody>, res) => {
+  try {
+    const { nicknames } = req.body;
+    const dbMembers = await MemberService.getMembers();
+    const promiseArray = [];
+    const time = new Date().toString();
 
-      nicknames.forEach((nickname) => {
-        if (nickname) {
-          const target = dbMembers.find(
-            (member) => member.nickname === nickname
-          );
-          if (target) {
-            const joinTime = new Date(target.lastJoinedTime).getTime();
-            const leaveTime = new Date(target.lastLeaveTime).getTime();
-            // 종료시간이 접속시간보다 큰데, 접속 중인 경우
-            if (leaveTime > joinTime) {
-              logger.info(
-                `오프라인으로 저장되었는데, 온라인 상태인 유저 [${target.nickname}]`
-              );
-              const history: DiscordHistory = { nickname, type: "join", time };
-              promiseArray.push(MemberService.editMember(history));
-              promiseArray.push(HistoryService.addHistory(history));
-            }
-          } else {
-            logger.info(`미등록 유저 [${nickname}]`);
+    nicknames.forEach((nickname) => {
+      if (nickname) {
+        const target = dbMembers.find((member) => member.nickname === nickname);
+        if (target) {
+          const joinTime = new Date(target.lastJoinedTime).getTime();
+          const leaveTime = new Date(target.lastLeaveTime).getTime();
+          // 종료시간이 접속시간보다 큰데, 접속 중인 경우
+          if (leaveTime > joinTime) {
+            logger.info(`오프라인으로 저장되었는데, 온라인 상태인 유저 [${target.nickname}]`);
             const history: DiscordHistory = { nickname, type: "join", time };
-            promiseArray.push(MemberService.addMember(history));
+            promiseArray.push(MemberService.editMember(history));
             promiseArray.push(HistoryService.addHistory(history));
           }
-        }
-      });
-
-      dbMembers.forEach((member) => {
-        const joinTime = new Date(member.lastJoinedTime).getTime();
-        const leaveTime = new Date(member.lastLeaveTime).getTime();
-
-        if (joinTime > leaveTime && !nicknames.includes(member.nickname)) {
-          logger.info(
-            `온라인으로 저장되었는데 오프라인 상태인 유저 [${member.nickname}]`
-          );
-
-          const history: DiscordHistory = {
-            nickname: member.nickname,
-            type: "leave",
-            time,
-          };
-          promiseArray.push(MemberService.editMember(history));
+        } else {
+          logger.info(`미등록 유저 [${nickname}]`);
+          const history: DiscordHistory = { nickname, type: "join", time };
+          promiseArray.push(MemberService.addMember(history));
           promiseArray.push(HistoryService.addHistory(history));
         }
-      });
-      await Promise.all(promiseArray);
-      res.send("ok");
-    } catch (error) {
-      res.status(500).send(error);
-      logger.error(error);
-    }
+      }
+    });
+
+    dbMembers.forEach((member) => {
+      const joinTime = new Date(member.lastJoinedTime).getTime();
+      const leaveTime = new Date(member.lastLeaveTime).getTime();
+
+      if (joinTime > leaveTime && !nicknames.includes(member.nickname)) {
+        logger.info(`온라인으로 저장되었는데 오프라인 상태인 유저 [${member.nickname}]`);
+
+        const history: DiscordHistory = {
+          nickname: member.nickname,
+          type: "leave",
+          time,
+        };
+        promiseArray.push(MemberService.editMember(history));
+        promiseArray.push(HistoryService.addHistory(history));
+      }
+    });
+    await Promise.all(promiseArray);
+    return res.send("ok");
+  } catch (error) {
+    logger.error(error);
+    return res.status(500).send(error);
   }
-);
+});
 
 export default HistoryRouter;

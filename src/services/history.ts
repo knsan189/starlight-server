@@ -13,7 +13,7 @@ export default class HistoryService {
               (error) => {
                 if (error) throw new Error(error.message);
                 resolve("success");
-              }
+              },
             );
           } catch (error) {
             reject(error);

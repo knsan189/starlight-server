@@ -14,15 +14,15 @@ import raidsRouter from "./src/routes/raids.js";
 import FortuneRouter from "./src/routes/fortune.js";
 import HistoryRouter from "./src/routes/history.js";
 
+const isDev = process.env.NODE_ENV.trim() !== "production";
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-log4js.configure(path.join(__dirname, "log4js.json"));
-
+log4js.configure(path.join(__dirname, isDev ? "log4js.json" : "../log4js.json"));
 app.set("views", path.join(__dirname, "src/views"));
 app.set("view engine", "pug");
-app.use(logger(process.env.NODE_ENV !== "production" ? "common" : "dev"));
+app.use(logger(isDev ? "dev" : "common"));
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -42,6 +42,7 @@ app.use(function (req, res, next) {
 });
 
 // error handler
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 app.use(function (err, req, res, next) {
   // set locals, only providing error in development
   res.locals.message = err.message;

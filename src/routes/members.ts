@@ -7,7 +7,7 @@ router.get("/", (req, res) => {
   try {
     const sql = "SELECT * FROM Members ORDER BY createdTime DESC";
     getConnection((connection) => {
-      connection.query(sql, (error, result, fields) => {
+      connection.query(sql, (error, result) => {
         if (error) {
           throw new Error(error.message);
         }
@@ -68,25 +68,15 @@ router.put("/", (req, res) => {
     memo: userData.memo ? userData.memo : undefined,
   };
 
-  const { tags, loadTime, charLevel, itemLevel, memo, guildName, serverName } =
-    member;
+  const { tags, loadTime, charLevel, itemLevel, memo, guildName, serverName } = member;
 
   const sql =
     "UPDATE Members SET tags=?, loadTime=?, charLevel=?, itemLevel=?, memo=?, guildName=?, serverName=? WHERE charName=?";
 
-  const values = [
-    tags,
-    loadTime,
-    charLevel,
-    itemLevel,
-    memo,
-    guildName,
-    serverName,
-    charName,
-  ];
+  const values = [tags, loadTime, charLevel, itemLevel, memo, guildName, serverName, charName];
 
   getConnection((connection) => {
-    connection.query(sql, values, (error, result, fields) => {
+    connection.query(sql, values, (error) => {
       if (error) {
         throw new Error(error.message);
       }
@@ -101,7 +91,7 @@ router.delete("/", (req, res) => {
   const sql = "DELETE FROM Members WHERE userCode=?";
 
   getConnection((connection) => {
-    connection.query(sql, [userCode], (error, result, fields) => {
+    connection.query(sql, [userCode], (error) => {
       if (error) {
         res.status(400).send("Bad Request");
       }

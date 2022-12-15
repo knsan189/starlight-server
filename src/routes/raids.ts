@@ -7,7 +7,7 @@ router.get("/", (req, res) => {
   const { id } = req.query;
   const sql = "SELECT * FROM Raids WHERE id=?";
   getConnection((connection) => {
-    connection.query(sql, id, (err, result, fields) => {
+    connection.query(sql, id, (err, result) => {
       try {
         if (err) throw new Error(err.message);
         const [data] = result;
@@ -42,17 +42,13 @@ router.put("/", (req, res) => {
   const { parties, title } = raid;
   const sql = "UPDATE Raids SET title=?, parties=? WHERE id=?";
   getConnection((connection) => {
-    connection.query(
-      sql,
-      [title, JSON.stringify(parties), id],
-      (err, result) => {
-        if (err) {
-          res.status(400).send("bad request");
-          return;
-        }
-        res.send("success");
+    connection.query(sql, [title, JSON.stringify(parties), id], (err) => {
+      if (err) {
+        res.status(400).send("bad request");
+        return;
       }
-    );
+      res.send("success");
+    });
     connection.release();
   });
 });

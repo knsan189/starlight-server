@@ -104,21 +104,24 @@ interface AddressRequest {
 }
 
 interface AddressResponse {
-  service: unknown;
-  status: string;
-  result: { zipcode: string; text: string; structure: string }[];
+  response: {
+    service: unknown;
+    status: string;
+    result: { zipcode: string; text: string; structure: string }[];
+  };
 }
 
-const addressMap = new Map<string, AddressResponse["result"]>();
+const addressMap = new Map<string, AddressResponse["response"]["result"]>();
 
 MapRouter.get("/address", async (req: Request<unknown, unknown, unknown, AddressRequest>, res) => {
   try {
     const { lon, lat } = req.query;
-    const point = `${lon},${lat}`;
 
     if (!lon || !lat) {
       return res.status(400).send("좌표값이 올바르지 않습니다.");
     }
+
+    const point = `${lon},${lat}`;
 
     const cached = addressMap.get(point);
 
@@ -145,9 +148,8 @@ MapRouter.get("/address", async (req: Request<unknown, unknown, unknown, Address
       addressMap.clear();
     }
 
-    addressMap.set(point, response.data.result);
-
-    return res.send(response.data.result);
+    addressMap.set(point, response.data.response.result);
+    return res.send(response.data.response.result);
   } catch (error) {
     console.log(error);
     return res.status(500).send(error);

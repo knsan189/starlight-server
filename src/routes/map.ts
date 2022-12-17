@@ -167,7 +167,7 @@ interface StoreRequestBody {
     lon: number;
   };
 }
-MapRouter.post("/store", async (req: Request<unknown, unknown, StoreRequestBody>, res) => {
+MapRouter.post("/storeList", async (req: Request<unknown, unknown, StoreRequestBody>, res) => {
   try {
     const { northEast, southWest } = req.body;
     const x1 = southWest.lon;
@@ -175,18 +175,27 @@ MapRouter.post("/store", async (req: Request<unknown, unknown, StoreRequestBody>
     const x2 = northEast.lon;
     const y2 = northEast.lat;
 
+    /**
+     * 공간 질의 함수 Mysql 지도 함수
+     * https://dev.mysql.com/doc/refman/5.7/en/spatial-relation-functions-mbr.html
+     */
     const sql =
       `SELECT * ` +
       `FROM store ` +
-      `WHERE MBRContains(ST_GeomFromText('Polygon((${x1} ${y1},${x1} ${y2}, ${x2} ${y2}, ${x2} ${y1}, ${x1} ${y1}))'), ST_GeomFromText('Point('+store.lon, store.lat)'))`;
+      `WHERE MBRCONTAINS(ST_GeomFromText('Polygon((${x1} ${y1},${x1} ${y2}, ${x2} ${y2}, ${x2} ${y1}, ${x1} ${y1}))'), ST_GEOMFROMTEXT(CONCAT('Point(',store.lon,' ', store.lat,')')))`;
 
-    console.log(sql);
+    const sql2 =
+      `SELECT * ` +
+      `FROM store ` +
+      `WHERE store.lon > ${x1} ` +
+      `AND store.lat > ${y1} ` +
+      `AND store.lon < ${x2} ` +
+      `AND store.lat < ${y2} `;
 
     const response = await new Promise((resolve, reject) => {
       getConnection((connection) => {
         connection.query(sql, (error, result) => {
           if (error) reject(error);
-          console.log(result);
           resolve(result);
         });
         connection.release();

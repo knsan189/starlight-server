@@ -1,5 +1,5 @@
 #!/bin/bash
 
-pgrep node | xargs kill
+pgrep starlight-ser | xargs kill
 
 exit 0

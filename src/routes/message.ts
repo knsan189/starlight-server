@@ -163,6 +163,11 @@ MessageRouter.post("/", async (req, res) => {
       });
     }
 
+    if (msg.indexOf("/전달") === 0) {
+      const reply = msg.replace("/전달", "").trim();
+      return res.send({ status: "ok", reply });
+    }
+
     return res.send("ok");
   } catch (error) {
     logger.error(error);

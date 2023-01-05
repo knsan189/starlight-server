@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
 /**
  * Module dependencies.
@@ -8,6 +9,7 @@ import app from "../app.js";
 import Debug from "debug";
 import * as http from "http";
 import process from "process";
+import { Server } from "socket.io";
 
 const debug = Debug("starlight:server");
 process.title = "starlight-server";
@@ -29,6 +31,14 @@ const server = http.createServer(app);
  * Listen on provided port, on all network interfaces.
  */
 
+const io = new Server(server, {
+  cors: {
+    origin: ["https://admin.socket.io", "http://localhost:3000"],
+    methods: ["GET", "POST"],
+    credentials: true,
+  },
+});
+
 server.listen(port, "0.0.0.0");
 console.log(`running on http://localhost:${port}`);
 server.on("error", onError);
@@ -39,7 +49,7 @@ server.on("listening", onListening);
  */
 
 function normalizePort(val: any) {
-  var port = parseInt(val, 10);
+  const port = parseInt(val, 10);
 
   if (isNaN(port)) {
     // named pipe
@@ -85,7 +95,7 @@ function onError(error: any) {
  */
 
 function onListening() {
-  var addr = server.address();
-  var bind = typeof addr === "string" ? "pipe " + addr : "port " + addr?.port;
+  const addr = server.address();
+  const bind = typeof addr === "string" ? "pipe " + addr : "port " + addr?.port;
   debug("Listening on " + bind);
 }

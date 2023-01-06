@@ -26,7 +26,8 @@
       "type": "logLevelFilter",
       "level": "ERROR",
       "appender": "errorFile"
-    }
+    },
+    "everything": { "type": "dateFile", "filename": "all-the-logs.log" }
   },
   "categories": {
     "default": {

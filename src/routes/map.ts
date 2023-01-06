@@ -184,13 +184,13 @@ MapRouter.post("/storeList", async (req: Request<unknown, unknown, StoreRequestB
       `FROM store ` +
       `WHERE MBRCONTAINS(ST_GeomFromText('Polygon((${x1} ${y1},${x1} ${y2}, ${x2} ${y2}, ${x2} ${y1}, ${x1} ${y1}))'), ST_GEOMFROMTEXT(CONCAT('Point(',store.longitude,' ', store.latitude,')')))`;
 
-    const sql2 =
-      `SELECT * ` +
-      `FROM store ` +
-      `WHERE store.longitude > ${x1} ` +
-      `AND store.latitude > ${y1} ` +
-      `AND store.longitude < ${x2} ` +
-      `AND store.latitude < ${y2} `;
+    // const sql2 =
+    //   `SELECT * ` +
+    //   `FROM store ` +
+    //   `WHERE store.longitude > ${x1} ` +
+    //   `AND store.latitude > ${y1} ` +
+    //   `AND store.longitude < ${x2} ` +
+    //   `AND store.latitude < ${y2} `;
 
     const response = await new Promise((resolve, reject) => {
       getConnection((connection) => {

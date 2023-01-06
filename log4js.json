@@ -31,15 +31,15 @@
   },
   "categories": {
     "default": {
-      "appenders": ["app", "errors", "info"],
+      "appenders": ["app", "errors", "info", "everything"],
       "level": "info"
     },
     "message": {
-      "appenders": ["app", "errors", "info"],
+      "appenders": ["app", "errors", "info", "everything"],
       "level": "info"
     },
     "history": {
-      "appenders": ["app", "errors", "info"],
+      "appenders": ["app", "errors", "info", "everything"],
       "level": "info"
     }
   }

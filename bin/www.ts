@@ -9,7 +9,7 @@ import app from "../app.js";
 import Debug from "debug";
 import * as http from "http";
 import process from "process";
-import { Server } from "socket.io";
+import { io } from "../src/socket.js";
 
 const debug = Debug("starlight:server");
 process.title = "starlight-server";
@@ -31,14 +31,7 @@ const server = http.createServer(app);
  * Listen on provided port, on all network interfaces.
  */
 
-const io = new Server(server, {
-  cors: {
-    origin: ["https://admin.socket.io", "http://localhost:3000"],
-    methods: ["GET", "POST"],
-    credentials: true,
-  },
-});
-
+io.attach(server);
 server.listen(port, "0.0.0.0");
 console.log(`running on http://localhost:${port}`);
 server.on("error", onError);

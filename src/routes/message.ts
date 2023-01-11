@@ -7,6 +7,7 @@ import { MessageRequest, MessageResponse } from "../@types/message";
 import { DiscordMember } from "../@types/types";
 import MemberService from "../services/member.js";
 import FortuneService from "../services/fortune.js";
+import { io } from "../socket.js";
 
 const { shuffle } = pkg;
 const MessageRouter = Router();
@@ -36,7 +37,9 @@ async function shuffleFortuneArray(): Promise<void> {
 
 MessageRouter.post("/", async (req, res) => {
   try {
-    const { msg, sender }: MessageRequest = req.body;
+    const { msg, sender, imageDB }: MessageRequest = req.body;
+
+    io.emit("message", { msg, sender, date: new Date().toString(), imageDB });
 
     let parsedSender = getParsedSender(sender);
 

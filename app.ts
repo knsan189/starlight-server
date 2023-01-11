@@ -29,7 +29,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, isDev ? "public" : "../public")));
 app.use("/api/map", MapRouter);
 app.use("/api/history", HistoryRouter);
 app.use("/api/island*", islandRouter);

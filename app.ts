@@ -6,7 +6,7 @@ import express from "express";
 import path from "path";
 import cookieParser from "cookie-parser";
 import logger from "morgan";
-import indexRouter from "./src/routes/index.js";
+import IndexRouter from "./src/routes/index.js";
 import islandRouter from "./src/routes/island.js";
 import messageRouter from "./src/routes/message.js";
 import membersRouter from "./src/routes/members.js";
@@ -36,7 +36,7 @@ app.use("/api/message*", messageRouter);
 app.use("/api/members*", membersRouter);
 app.use("/api/raid", raidsRouter);
 app.use("/api/fortune", FortuneRouter);
-app.use("*", indexRouter);
+app.use("*", IndexRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

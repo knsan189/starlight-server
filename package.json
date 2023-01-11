@@ -4,9 +4,9 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "set NODE_ENV=development && nodemon --exec ts-node bin/www.ts",
+    "dev": "cross-env NODE_ENV=development nodemon --exec ts-node bin/www.ts",
     "build": "tsc && cp -r src/views/ dist/src",
-    "start": "set NODE_ENV=production && node dist/bin/www.js"
+    "start": "cross-env NODE_ENV=production node dist/bin/www.js"
   },
   "dependencies": {
     "@socket.io/admin-ui": "^0.5.1",
@@ -15,6 +15,7 @@
     "cheerio": "^1.0.0-rc.12",
     "cookie-parser": "~1.4.4",
     "cors": "^2.8.5",
+    "cross-env": "^7.0.3",
     "date-fns": "^2.29.3",
     "debug": "~2.6.9",
     "dotenv": "^16.0.2",

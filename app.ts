@@ -16,6 +16,7 @@ import HistoryRouter from "./src/routes/history.js";
 import MapRouter from "./src/routes/map.js";
 
 const isDev = `${process.env.NODE_ENV}`.trim() === "development";
+
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

@@ -94,6 +94,7 @@ MessageRouter.post("/", async (req, res) => {
         logger.info(`별빛 : ${secondReply}`);
       }
 
+      fortuneSet.add(parsedSender);
       return res.send(response);
     }
 
@@ -169,11 +170,6 @@ MessageRouter.post("/", async (req, res) => {
         reply,
       });
     }
-
-    // if (msg.indexOf("/전달") === 0) {
-    //   const reply = msg.replace("/전달", "").trim();
-    //   return res.send({ status: "ok", reply });
-    // }
 
     return res.send("ok");
   } catch (error) {

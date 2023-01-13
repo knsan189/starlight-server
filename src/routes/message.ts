@@ -77,7 +77,17 @@ MessageRouter.post("/", async (req, res) => {
         return res.send(response);
       }
 
-      const { fortune, msg, delayTime } = await FortuneService.getFortune(index);
+      let fortune = "";
+      let msg = "";
+      let delayTime: number | undefined;
+
+      while (fortune.trim().length === 0) {
+        const response = await FortuneService.getFortune(index);
+        fortune = response.fortune;
+        msg = response.msg;
+        delayTime = response.delayTime;
+      }
+
       const reply = fortune.format(parsedSender);
       const secondReply = msg?.format(parsedSender);
 

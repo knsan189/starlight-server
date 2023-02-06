@@ -6,7 +6,7 @@ import express from "express";
 import path from "path";
 import cookieParser from "cookie-parser";
 import logger from "morgan";
-import indexRouter from "./src/routes/index.js";
+import IndexRouter from "./src/routes/index.js";
 import islandRouter from "./src/routes/island.js";
 import messageRouter from "./src/routes/message.js";
 import membersRouter from "./src/routes/members.js";
@@ -16,6 +16,7 @@ import HistoryRouter from "./src/routes/history.js";
 import MapRouter from "./src/routes/map.js";
 
 const isDev = `${process.env.NODE_ENV}`.trim() === "development";
+
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -28,7 +29,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.static(path.join(__dirname, isDev ? "public" : "../public")));
 app.use("/api/map", MapRouter);
 app.use("/api/history", HistoryRouter);
 app.use("/api/island*", islandRouter);
@@ -36,7 +37,7 @@ app.use("/api/message*", messageRouter);
 app.use("/api/members*", membersRouter);
 app.use("/api/raid", raidsRouter);
 app.use("/api/fortune", FortuneRouter);
-app.use("*", indexRouter);
+app.use("*", IndexRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {

@@ -5,9 +5,9 @@ import { formatDistanceToNow } from "date-fns";
 import ko from "date-fns/locale/ko/index.js";
 import { MessageRequest, MessageResponse } from "../@types/message";
 import { DiscordMember } from "../@types/types";
-import userScraper from "../utils/userScraper.js";
 import MemberService from "../services/member.js";
 import FortuneService from "../services/fortune.js";
+import { io } from "../socket.js";
 
 const { shuffle } = pkg;
 const MessageRouter = Router();
@@ -37,7 +37,10 @@ async function shuffleFortuneArray(): Promise<void> {
 
 MessageRouter.post("/", async (req, res) => {
   try {
-    const { msg, sender }: MessageRequest = req.body;
+    const { msg, sender, imageDB }: MessageRequest = req.body;
+
+    io.emit("message", { msg, sender, date: new Date().toString(), imageDB });
+
     let parsedSender = getParsedSender(sender);
 
     if (parsedSender.length > 2) {
@@ -74,21 +77,41 @@ MessageRouter.post("/", async (req, res) => {
         return res.send(response);
       }
 
-      const fortune = await FortuneService.getFortune(index);
+      let fortune = "";
+      let msg = "";
+      let delayTime: number | undefined;
+
+      while (fortune.trim().length === 0) {
+        const response = await FortuneService.getFortune(index);
+        fortune = response.fortune;
+        msg = response.msg;
+        delayTime = response.delayTime;
+      }
+
+      const reply = fortune.format(parsedSender);
+      const secondReply = msg?.format(parsedSender);
 
       const response: MessageResponse = {
         status: "ok",
-        reply: fortune.fortune.format(parsedSender),
-        secondReply: fortune.msg?.format(parsedSender),
-        delayTime: fortune.delayTime,
+        reply,
+        secondReply,
+        delayTime,
       };
+
+      logger.info(`별빛 : ${reply}`);
+
+      if (secondReply) {
+        logger.info(`별빛 : ${secondReply}`);
+      }
+
+      fortuneSet.add(parsedSender);
       return res.send(response);
     }
 
-    if (msg.indexOf("/유저") === 0) {
-      const nickname = msg.replace("/유저", "").trim();
-      const userData = await userScraper(nickname);
-    }
+    // if (msg.indexOf("/유저") === 0) {
+    //   const nickname = msg.replace("/유저", "").trim();
+    //   const userData = await userScraper(nickname);
+    // }
 
     if (msg.includes("승호") && msg.includes("언제")) {
       const member: DiscordMember = await MemberService.getMember("승호");

@@ -65,7 +65,7 @@ MapRouter.get("/search", async (req: Request<unknown, unknown, unknown, SearchRe
       url: "http://api.vworld.kr/req/search",
       method: "GET",
       params: {
-        key: "1B4CE4D9-5DDC-399B-97DC-D3DB9625DE6F",
+        key: "7A323BF6-02C6-3043-A9A3-BFF984E9EBF7",
         type: "PLACE",
         query: keyword,
         request: "search",
@@ -136,7 +136,7 @@ MapRouter.get("/address", async (req: Request<unknown, unknown, unknown, Address
       params: {
         service: "address",
         verison: "2.0",
-        key: "1B4CE4D9-5DDC-399B-97DC-D3DB9625DE6F",
+        key: "7A323BF6-02C6-3043-A9A3-BFF984E9EBF7",
         request: "GetAddress",
         type: "both",
         point,
@@ -184,13 +184,13 @@ MapRouter.post("/storeList", async (req: Request<unknown, unknown, StoreRequestB
       `FROM store ` +
       `WHERE MBRCONTAINS(ST_GeomFromText('Polygon((${x1} ${y1},${x1} ${y2}, ${x2} ${y2}, ${x2} ${y1}, ${x1} ${y1}))'), ST_GEOMFROMTEXT(CONCAT('Point(',store.longitude,' ', store.latitude,')')))`;
 
-    const sql2 =
-      `SELECT * ` +
-      `FROM store ` +
-      `WHERE store.longitude > ${x1} ` +
-      `AND store.latitude > ${y1} ` +
-      `AND store.longitude < ${x2} ` +
-      `AND store.latitude < ${y2} `;
+    // const sql2 =
+    //   `SELECT * ` +
+    //   `FROM store ` +
+    //   `WHERE store.longitude > ${x1} ` +
+    //   `AND store.latitude > ${y1} ` +
+    //   `AND store.longitude < ${x2} ` +
+    //   `AND store.latitude < ${y2} `;
 
     const response = await new Promise((resolve, reject) => {
       getConnection((connection) => {

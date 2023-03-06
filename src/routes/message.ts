@@ -7,6 +7,7 @@ import { MessageRequest, MessageResponse } from "../@types/message";
 import { DiscordMember } from "../@types/types";
 import MemberService from "../services/member.js";
 import FortuneService from "../services/fortune.js";
+import LostarkService from "../services/lostark.js";
 import { io } from "../socket.js";
 
 const { shuffle } = pkg;
@@ -178,6 +179,22 @@ MessageRouter.post("/", async (req, res) => {
       return res.send({
         status: "ok",
         reply,
+      });
+    }
+
+    if (msg === "/도가토") {
+      const { Raids } = await LostarkService.getGuardians();
+      return res.send({
+        status: "ok",
+        reply: `이번주 도전 가디언 토벌은 : \n ${Raids.map((r) => r.Name).join(", ")} 입니다.`,
+      });
+    }
+
+    if (msg === "/도비스") {
+      const abyss = await LostarkService.getAbyss();
+      return res.send({
+        status: "ok",
+        reply: `이번주 도전 어비스 지역은 : \n ${abyss[0].AreaName} 입니다.`,
       });
     }
 

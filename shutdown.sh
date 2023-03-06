@@ -1,5 +1,5 @@
 #!/bin/bash
 
-pgrep starlight-ser | xargs kill
+pgrep starlight-server | xargs kill
 
 exit 0

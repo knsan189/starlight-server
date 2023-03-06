@@ -3,12 +3,12 @@
     "target": "ESNext",
     "module": "ESNext",
     "moduleResolution": "Node",
-    "esModuleInterop": true,
+    // "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "forceConsistentCasingInFileNames": true,
-    "noFallthroughCasesInSwitch": true,
-    "isolatedModules": true,
-    "noEmit": true,
+    // "forceConsistentCasingInFileNames": true,
+    // "noFallthroughCasesInSwitch": true,
+    // "isolatedModules": true,
+    // "noEmit": true,
     "outDir": "dist"
   },
   "ts-node": {

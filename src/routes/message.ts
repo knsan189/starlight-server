@@ -83,9 +83,9 @@ MessageRouter.post("/", async (req, res) => {
       let delayTime: number | undefined;
 
       while (fortune.trim().length === 0) {
-        const response = await FortuneService.getFortune(index);
+        const response = await FortuneService.getFortune(index || 0);
         fortune = response.fortune;
-        msg = response.msg;
+        msg = response.msg || "";
         delayTime = response.delayTime;
       }
 
@@ -121,6 +121,10 @@ MessageRouter.post("/", async (req, res) => {
 
       const { lastJoinedTime, lastLeaveTime } = member;
 
+      if (!lastJoinedTime || !lastLeaveTime) {
+        return;
+      }
+
       if (new Date(lastJoinedTime).getTime() > new Date(lastLeaveTime).getTime()) {
         const date = formatDistanceToNow(new Date(lastJoinedTime), {
           addSuffix: true,
@@ -151,7 +155,7 @@ MessageRouter.post("/", async (req, res) => {
       const currentUser: DiscordMember[] = [];
 
       members.forEach((member) => {
-        if (member.lastLeaveTime) {
+        if (member.lastLeaveTime && member.lastJoinedTime) {
           const joinTime = new Date(member.lastJoinedTime).getTime();
           const leaveTime = new Date(member.lastLeaveTime).getTime();
           if (joinTime > leaveTime) {

@@ -77,7 +77,7 @@ MapRouter.get("/search", async (req: Request<unknown, unknown, unknown, SearchRe
     }
 
     const result: Place[] = [];
-    const addressArr = [];
+    const addressArr: string[] = [];
 
     response.data.response.result.items.forEach((item) => {
       if (item.address.road && !addressArr.includes(item.address.road)) {

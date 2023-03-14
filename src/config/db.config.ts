@@ -8,14 +8,12 @@ const pool = mysql.createPool({
   user: process.env.MYSQL_ID,
   password: process.env.MYSQL_PW,
   database: process.env.MYSQL_DB_NAME,
-  port: parseInt(process.env.MYSQL_PORT),
+  port: parseInt(process.env.MYSQL_PORT || ""),
   connectionLimit: 30,
   dateStrings: ["DATETIME"],
 });
 
-export const getConnection = (
-  callback: (connection: PoolConnection) => void
-) => {
+export const getConnection = (callback: (connection: PoolConnection) => void) => {
   pool.getConnection((error, connection) => {
     if (!error) {
       callback(connection);

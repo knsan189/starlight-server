@@ -10,7 +10,6 @@
   },
   "dependencies": {
     "@socket.io/admin-ui": "^0.5.1",
-    "asciify-image": "^0.1.9",
     "axios": "^0.27.2",
     "cheerio": "^1.0.0-rc.12",
     "cookie-parser": "~1.4.4",

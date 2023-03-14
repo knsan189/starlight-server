@@ -1,8 +1,21 @@
 import { Request, Response, Router } from "express";
 import { Fortune } from "../@types/types";
 import FortuneService from "../services/fortune.js";
+import pkg from "lodash";
+const { shuffle } = pkg;
+
+let fortuneIndexArray: number[] = [];
+let timeStamp = new Date();
 
 const FortuneRouter = Router();
+
+async function shuffleFortuneArray(): Promise<void> {
+  const count = await FortuneService.getCount();
+  for (let i = 1; i <= count; i++) {
+    fortuneIndexArray.push(i);
+  }
+  fortuneIndexArray = shuffle(fortuneIndexArray);
+}
 
 type Params = {
   id: number;
@@ -33,6 +46,21 @@ FortuneRouter.put("/:id", async (req: Request<Params, unknown, ReqBody>, res: Re
     return res.send("ok");
   } catch (err) {
     return res.status(500).send(err);
+  }
+});
+
+FortuneRouter.get("/random", async (req, res) => {
+  try {
+    if (fortuneIndexArray.length === 0 || timeStamp.getDate() !== new Date().getDate()) {
+      await shuffleFortuneArray();
+      timeStamp = new Date();
+    }
+    const index = fortuneIndexArray.shift() || 0;
+    const response = await FortuneService.getFortune(index);
+    return res.send(response);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send(error);
   }
 });
 

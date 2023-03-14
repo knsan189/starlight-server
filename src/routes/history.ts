@@ -52,13 +52,13 @@ HistoryRouter.post("/sync", async (req: Request<unknown, unknown, SyncRequestBod
   try {
     const { nicknames } = req.body;
     const dbMembers = await MemberService.getMembers();
-    const promiseArray = [];
+    const promiseArray: Promise<any>[] = [];
     const time = new Date().toString();
 
     nicknames.forEach((nickname) => {
       if (nickname) {
         const target = dbMembers.find((member) => member.nickname === nickname);
-        if (target) {
+        if (target && target.lastJoinedTime && target.lastLeaveTime) {
           const joinTime = new Date(target.lastJoinedTime).getTime();
           const leaveTime = new Date(target.lastLeaveTime).getTime();
           // 종료시간이 접속시간보다 큰데, 접속 중인 경우
@@ -78,19 +78,21 @@ HistoryRouter.post("/sync", async (req: Request<unknown, unknown, SyncRequestBod
     });
 
     dbMembers.forEach((member) => {
-      const joinTime = new Date(member.lastJoinedTime).getTime();
-      const leaveTime = new Date(member.lastLeaveTime).getTime();
+      if (member.lastJoinedTime && member.lastLeaveTime) {
+        const joinTime = new Date(member.lastJoinedTime).getTime();
+        const leaveTime = new Date(member.lastLeaveTime).getTime();
 
-      if (joinTime > leaveTime && !nicknames.includes(member.nickname)) {
-        logger.info(`온라인으로 저장되었는데 오프라인 상태인 유저 [${member.nickname}]`);
+        if (joinTime > leaveTime && !nicknames.includes(member.nickname)) {
+          logger.info(`온라인으로 저장되었는데 오프라인 상태인 유저 [${member.nickname}]`);
 
-        const history: DiscordHistory = {
-          nickname: member.nickname,
-          type: "leave",
-          time,
-        };
-        promiseArray.push(MemberService.editMember(history));
-        promiseArray.push(HistoryService.addHistory(history));
+          const history: DiscordHistory = {
+            nickname: member.nickname,
+            type: "leave",
+            time,
+          };
+          promiseArray.push(MemberService.editMember(history));
+          promiseArray.push(HistoryService.addHistory(history));
+        }
       }
     });
     await Promise.all(promiseArray);

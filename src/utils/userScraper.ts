@@ -4,29 +4,22 @@ import { Jewel, UserData } from "../@types/types";
 
 const tagRegex = /<[^>]*>?/g;
 
-export default async function userScraper(
-  nickname: string
-): Promise<UserData | null> {
+export default async function userScraper(nickname: string): Promise<UserData | null> {
   try {
     const response = await axios({
       method: "get",
-      url: `https://lostark.game.onstove.com/Profile/Character/${encodeURI(
-        nickname
-      )}`,
+      url: `https://lostark.game.onstove.com/Profile/Character/${encodeURI(nickname)}`,
     });
 
     if (!response) throw new Error("로스트아크 서버 점검중입니다.");
 
-    const parseHtml = response.data
-      .replace("<!DOCTYPE html>", "")
-      .replace(/\r?\n|\r/g, "");
+    const parseHtml = response.data.replace("<!DOCTYPE html>", "").replace(/\r?\n|\r/g, "");
 
     const $ = cheerio.load(parseHtml);
 
     const charClass = $(".profile-character-info__img").attr("alt");
 
-    if (!charClass || !charClass.length)
-      throw new Error("존재하지 않는 캐릭터명 입니다.");
+    if (!charClass || !charClass.length) throw new Error("존재하지 않는 캐릭터명 입니다.");
 
     const itemLevel = $(".level-info2__expedition")
       .text()
@@ -35,11 +28,9 @@ export default async function userScraper(
     const charLevel = $(".level-info__item")
       .text()
       .replace(/[^0-9]/g, "");
-    const serverName = $(".profile-character-info__server")
-      .text()
-      .replace("@", "");
+    const serverName = $(".profile-character-info__server").text().replace("@", "");
     const guildName = $(".game-info__guild").text().substring(2);
-    const charImg = $(".profile-equipment__character img").attr("src");
+    const charImg = $(".profile-equipment__character img").attr("src") || "";
 
     const engraveElement = $(".profile-ability-engrave span");
     const engraveArray: string[] = [];
@@ -64,17 +55,13 @@ export default async function userScraper(
 
     if (text.includes("$.Profile =")) {
       text = text.replace("$.Profile =", "");
-      const { Equip, GemSkillEffect } = JSON.parse(
-        text.substring(0, text.length - 1)
-      );
+      const { Equip, GemSkillEffect } = JSON.parse(text.substring(0, text.length - 1));
       const equipment = Equip;
       Object.keys(equipment).forEach((key) => {
         if (!key.includes("Gem")) {
           const itemNum = parseInt(key.slice(-2), 10);
           if (itemNum <= 5) {
-            equipmentArray.push(
-              equipment[key].Element_000.value.replace(/<[^>]*>?/g, "")
-            );
+            equipmentArray.push(equipment[key].Element_000.value.replace(/<[^>]*>?/g, ""));
           }
         }
       });
@@ -86,7 +73,7 @@ export default async function userScraper(
           const jewelImg = `https://cdn-lostark.game.onstove.com/${jewelData.Element_001.value.slotData.iconPath}`;
           const jewelLevel = jewelData.Element_001.value.slotData.rtString;
           const jewelSkill = GemSkillEffect.find(
-            ({ EquipGemSlotIndex }) => EquipGemSlotIndex === index
+            ({ EquipGemSlotIndex }) => EquipGemSlotIndex === index,
           ).SkillDesc.replace(tagRegex, "");
           const jewelGrade = jewelData.Element_001.value.slotData.iconGrade;
           jewelArray.push({

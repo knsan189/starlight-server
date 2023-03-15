@@ -38,3 +38,75 @@ interface Calendar {
     StartTimes: string[] | null;
   }[];
 }
+
+interface Profile {
+  CharacterImage: string;
+  ExpeditionLevel: number;
+  PvpGradeName: string;
+  TownLevel: number | null;
+  TownName: string | null;
+  Title: string;
+  GuildMemberGrade: string;
+  GuildName: string;
+  UsingSkillPoint: number;
+  TotalSkillPoint: number;
+  Stats: [
+    {
+      Type: string;
+      Value: string;
+      Tooltip: string[];
+    },
+  ];
+  Tendencies: [
+    {
+      Type: string;
+      Point: number;
+      MaxPoint: number;
+    },
+  ];
+  ServerName: string;
+  CharacterName: string;
+  CharacterLevel: number;
+  CharacterClassName: string;
+  ItemAvgLevel: string;
+  ItemMaxLevel: string;
+}
+
+interface Equipment {
+  Type: string;
+  Name: string;
+  Icon: string;
+  Grade: string;
+  Tooltip: string;
+}
+
+interface Engraving {
+  Slot: number;
+  Name: string;
+  Icon: string;
+  Tooltip: string;
+}
+
+interface Gem {
+  Slot: number;
+  Name: string;
+  Icon: string;
+  Level: number;
+  Grade: string;
+  Tooltip: string;
+}
+
+interface Card {
+  Slot: number;
+  Name: string;
+  Icon: string;
+  AwakeCount: string;
+  AwakeTotal: string;
+  Grade: string;
+  Tooltip: string;
+}
+
+interface Effect {
+  Name: string;
+  Description: string;
+}

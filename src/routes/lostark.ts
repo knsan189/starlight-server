@@ -1,5 +1,5 @@
 import { format } from "date-fns";
-import { Router } from "express";
+import { Request, Router } from "express";
 import LostarkService from "../services/lostark.js";
 
 const LostarkRouter = Router();
@@ -71,5 +71,23 @@ LostarkRouter.get("/calendar", async (req, res) => {
     return res.status(500).send(error);
   }
 });
+
+LostarkRouter.get(
+  "/user",
+  async (req: Request<unknown, unknown, unknown, { userName: string }>, res) => {
+    try {
+      const { userName } = req.query;
+
+      if (!userName) {
+        return res.status(400).send("Bad Request");
+      }
+      const response = await LostarkService.getUser(encodeURIComponent(userName));
+      return res.send(response);
+    } catch (error) {
+      console.log(error);
+      return res.status(500).send(error);
+    }
+  },
+);
 
 export default LostarkRouter;

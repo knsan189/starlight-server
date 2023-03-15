@@ -5,6 +5,14 @@ interface GetGuardiansRepsonse {
   RewardItems: RewardItem[];
 }
 
+interface GetUserResponse {
+  profile: Profile;
+  equipment: Equipment[];
+  engravings: { Engravings: Engraving[]; Effects: Effect[] };
+  gems: { Gems: Gem[]; Effects: Effect[] };
+  cards: { Cards: Card[]; Effects: Effect[] };
+}
+
 type GetAbyssResponse = Abyss[];
 
 type GetCalendarResponse = Calendar[];
@@ -18,7 +26,7 @@ const resultMap = new Map<
 >();
 
 export default class LostarkService {
-  private static module = axios.create({
+  private static instance = axios.create({
     baseURL: "https://developer-lostark.game.onstove.com",
     headers: {
       authorization: `bearer ${API_KEY}`,
@@ -41,7 +49,7 @@ export default class LostarkService {
             }
           }
 
-          const response: AxiosResponse<GetGuardiansRepsonse> = await LostarkService.module({
+          const response: AxiosResponse<GetGuardiansRepsonse> = await LostarkService.instance({
             method: "GET",
             url: "/gamecontents/challenge-guardian-raids",
           });
@@ -71,7 +79,7 @@ export default class LostarkService {
             }
           }
 
-          const response: AxiosResponse<GetAbyssResponse> = await LostarkService.module({
+          const response: AxiosResponse<GetAbyssResponse> = await LostarkService.instance({
             method: "GET",
             url: "/gamecontents/challenge-abyss-dungeons",
           });
@@ -101,13 +109,50 @@ export default class LostarkService {
             }
           }
 
-          const response: AxiosResponse<GetCalendarResponse> = await LostarkService.module({
+          const response: AxiosResponse<GetCalendarResponse> = await LostarkService.instance({
             method: "GET",
             url: "/gamecontents/calendar",
           });
 
           resultMap.set("calendar", { response: response.data, timeStamp: new Date().toString() });
           resolve(response.data);
+        } catch (error) {
+          reject(error);
+        }
+      })();
+    });
+  }
+
+  public static getUser(userName: string): Promise<GetUserResponse> {
+    return new Promise((resolve, reject) => {
+      (async () => {
+        try {
+          const promiseArray = [
+            LostarkService.instance({
+              url: `/armories/characters/${userName}/profiles`,
+            }),
+            LostarkService.instance({
+              url: `/armories/characters/${userName}/equipment`,
+            }),
+            LostarkService.instance({
+              url: `/armories/characters/${userName}/engravings`,
+            }),
+            LostarkService.instance({
+              url: `/armories/characters/${userName}/gems`,
+            }),
+            LostarkService.instance({
+              url: `/armories/characters/${userName}/cards`,
+            }),
+          ];
+          const [profile, equipment, engravings, gems, cards] = await Promise.all(promiseArray);
+
+          resolve({
+            profile: profile.data,
+            equipment: equipment.data,
+            engravings: engravings.data,
+            gems: gems.data,
+            cards: cards.data,
+          });
         } catch (error) {
           reject(error);
         }

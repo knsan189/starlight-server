@@ -2,6 +2,6 @@
 
 npm run build && 
 nohup npm run start &&
-echo "Server on"
+echo "Starlight Main Server On" &
 
 exit 0

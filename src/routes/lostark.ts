@@ -26,7 +26,7 @@ LostarkRouter.get("/calendar", async (req, res) => {
   try {
     const today = format(new Date(), "yyyy-MM-dd");
     const response = await LostarkService.getCalendar();
-    const temp: any = [];
+    const calenders: Calendar[] = [];
     response.forEach((content) => {
       if (
         content.StartTimes.some((time) => time.includes(today)) &&
@@ -34,20 +34,26 @@ LostarkRouter.get("/calendar", async (req, res) => {
         content.CategoryName !== "섬" &&
         content.CategoryName !== "항해"
       ) {
-        temp.push({
-          name: content.ContentsName,
-          reward: content.RewardItems.find(
-            (item) =>
-              item.StartTimes?.some((time) => time.includes(today)) &&
-              (item.Name === "실링" ||
-                item.Name === "해적 주화" ||
-                item.Name === "골드" ||
-                item.Name.includes("카드")),
-          ),
+        const items: Calendar["RewardItems"] = content.RewardItems.filter(
+          (item) =>
+            (item.Name === "실링" ||
+              item.Name === "해적 주화" ||
+              item.Name === "골드" ||
+              item.Name.includes("카드 팩")) &&
+            item.StartTimes,
+        ).map((item) => ({
+          ...item,
+          StartTimes: item.StartTimes?.filter((time) => time.includes(today)) || [],
+        }));
+
+        calenders.push({
+          ...content,
+          StartTimes: content.StartTimes.filter((time) => time.includes(today)),
+          RewardItems: items,
         });
       }
     });
-    return res.send(temp);
+    return res.send(calenders);
   } catch (error) {
     console.log(error);
     return res.status(500).send(error);

@@ -12,7 +12,7 @@ import process from "process";
 import { io } from "../src/socket.js";
 
 const debug = Debug("starlight:server");
-process.title = "starlight-server";
+process.title = "starlightServer";
 
 /**
  * Get port from environment and store in Express.

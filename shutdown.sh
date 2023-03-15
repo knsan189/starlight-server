@@ -1,6 +1,6 @@
 #!/bin/bash
 
-pgrep starlight-server | xargs kill
+pgrep starlightServer | xargs kill
 
 echo "Server Off"
 

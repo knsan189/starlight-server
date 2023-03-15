@@ -36,7 +36,7 @@ app.use("/api/lostark", LostarkRouter);
 app.use("/api/history", HistoryRouter);
 app.use("/api/island*", islandRouter);
 app.use("/api/message*", messageRouter);
-app.use("/api/members*", membersRouter);
+app.use("/api/members", membersRouter);
 app.use("/api/raid", raidsRouter);
 app.use("/api/fortune", FortuneRouter);
 app.use("*", IndexRouter);

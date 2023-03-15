@@ -1,5 +1,6 @@
-import { Router } from "express";
+import { Request, Router } from "express";
 import { getConnection } from "../config/db.config.js";
+import MemberService from "../services/member.js";
 
 const router = Router();
 
@@ -99,6 +100,27 @@ router.delete("/", (req, res) => {
     });
     connection.release();
   });
+});
+
+router.get("/list", async (req, res) => {
+  try {
+    const response = await MemberService.getMembers();
+    return res.send(response);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).send(err);
+  }
+});
+
+router.get("/list/:id", async (req: Request<{ id: string }>, res) => {
+  try {
+    const { id } = req.params;
+    const response = await MemberService.getMember(id);
+    return res.send(response);
+  } catch (err) {
+    console.error(err);
+    return res.status(500).send(err);
+  }
 });
 
 export default router;

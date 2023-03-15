@@ -6,11 +6,11 @@ interface GetGuardiansRepsonse {
 }
 
 interface GetUserResponse {
-  profile: Profile;
-  equipment: Equipment[];
-  engravings: { Engravings: Engraving[]; Effects: Effect[] };
-  gems: { Gems: Gem[]; Effects: Effect[] };
-  cards: { Cards: Card[]; Effects: Effect[] };
+  profile: Profile | null;
+  equipment: Equipment[] | null;
+  engravings: { Engravings: Engraving[]; Effects: Effect[] } | null;
+  gems: { Gems: Gem[]; Effects: Effect[] } | null;
+  cards: { Cards: Card[]; Effects: Effect[] } | null;
 }
 
 type GetAbyssResponse = Abyss[];

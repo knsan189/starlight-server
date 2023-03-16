@@ -5,6 +5,8 @@ interface GetGuardiansRepsonse {
   RewardItems: RewardItem[];
 }
 
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+
 interface GetUserResponse {
   profile: Profile | null;
   equipment: Equipment[] | null;

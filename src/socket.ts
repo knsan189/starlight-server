@@ -4,32 +4,19 @@ import dgram from "dgram";
 export const io = new Server({
   cors: {
     origin: "*",
-    // methods: ["GET", "POST"],
-    // credentials: true,
   },
 });
 
 const udp = dgram.createSocket("udp4");
 
-// {
-//   "event": "chat",
-//   "session": false,
-//   "success": {},
-//   "data": {
-//     "sender": "테스트",
-//     "content": "/테스트"
-//   }
-// }
-
 io.on("connection", (socket) => {
   console.log(socket.id);
-  socket.on("message", (message: string) => {
+  socket.on("client-message", (message: string) => {
     const string = JSON.stringify({
       event: "chat",
-      session: undefined,
       success: undefined,
       data: {
-        sender: "테스트",
+        sender: "진하늘",
         content: message,
         room: "진하늘",
         isGroupChat: false,
@@ -43,6 +30,22 @@ io.on("connection", (socket) => {
   });
 });
 
-udp.on("message", (msg) => {
-  console.log(msg);
+udp.on("message", (msg, info) => {
+  const message = JSON.parse(decodeURIComponent(msg.toString()));
+  const { event, data, session } = message;
+
+  const reply = JSON.stringify({
+    event: undefined,
+    session,
+    success: true,
+    data: undefined,
+  });
+
+  udp.send(Buffer.from(reply), 4000, "127.0.0.1");
+  io.emit("server-message", {
+    msg: message.data.text,
+    sender: message.data.room,
+    imageDB: "",
+    date: new Date().toString(),
+  });
 });

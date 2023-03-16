@@ -41,7 +41,7 @@ udp.on("message", (msg, info) => {
     data: undefined,
   });
 
-  udp.send(Buffer.from(reply), 4000, "127.0.0.1");
+  udp.send(Buffer.from(reply), 4000, "192.168.0.39");
   io.emit("server-message", {
     msg: message.data.text,
     sender: message.data.room,

@@ -32,7 +32,7 @@ const server = http.createServer(app);
  */
 
 io.attach(server);
-server.listen(port, "0.0.0.0");
+server.listen(port);
 console.log(`running on http://localhost:${port}`);
 server.on("error", onError);
 server.on("listening", onListening);

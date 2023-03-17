@@ -12,6 +12,7 @@ const udp = dgram.createSocket("udp4");
 io.on("connection", (socket) => {
   console.log(socket.id);
   socket.on("client-message", (message: string) => {
+    console.log(message);
     const string = JSON.stringify({
       event: "chat",
       success: undefined,
@@ -26,13 +27,25 @@ io.on("connection", (socket) => {
     });
 
     const buffer = Buffer.from(string);
-    udp.send(buffer, 4000, "127.0.0.1");
+    udp.send(buffer, 4000, "knsan189.iptime.org");
+  });
+
+  socket.on("remote-message", (msg) => {
+    console.log(msg);
+    io.emit("server-message", {
+      msg: msg.content,
+      sender: msg.sender.name,
+      imageDB: "",
+      date: new Date().toString(),
+    });
   });
 });
 
 udp.on("message", (msg, info) => {
   const message = JSON.parse(decodeURIComponent(msg.toString()));
   const { event, data, session } = message;
+
+  console.log(data);
 
   const reply = JSON.stringify({
     event: undefined,
@@ -41,10 +54,10 @@ udp.on("message", (msg, info) => {
     data: undefined,
   });
 
-  udp.send(Buffer.from(reply), 4000, "192.168.0.39");
+  udp.send(Buffer.from(reply), 4000, "knsan189.iptime.org");
   io.emit("server-message", {
-    msg: message.data.text,
-    sender: message.data.room,
+    msg: data.text,
+    sender: data.room,
     imageDB: "",
     date: new Date().toString(),
   });

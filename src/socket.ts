@@ -11,10 +11,10 @@ const udp = dgram.createSocket("udp4");
 
 io.on("connection", (socket) => {
   console.log(socket.id);
-  socket.on("client-message", (message: string) => {
+  socket.on("client-message", (message: string, event: "sendText" | "chat") => {
     console.log(message);
     const string = JSON.stringify({
-      event: "chat",
+      event,
       success: undefined,
       data: {
         sender: "진하늘",

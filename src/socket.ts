@@ -35,7 +35,7 @@ io.on("connection", (socket) => {
     io.emit("server-message", {
       msg: msg.content,
       sender: msg.sender.name,
-      imageDB: "",
+      imageDB: msg.profileImage,
       date: new Date().toString(),
     });
   });

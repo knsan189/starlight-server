@@ -30,7 +30,6 @@ io.on("connection", (socket) => {
   });
 
   socket.on("remote-message", (msg) => {
-    console.log(msg);
     io.emit("server-message", {
       msg: msg.content,
       sender: msg.sender.name,
@@ -43,9 +42,6 @@ io.on("connection", (socket) => {
 udp.on("message", (msg, info) => {
   const message = JSON.parse(decodeURIComponent(msg.toString()));
   const { event, data, session } = message;
-
-  console.log(data);
-
   const reply = JSON.stringify({
     event: undefined,
     session,

@@ -10,9 +10,8 @@ export const io = new Server({
 const udp = dgram.createSocket("udp4");
 
 io.on("connection", (socket) => {
-  console.log(socket.id);
+  console.log("소켓 연결 :", socket.id);
   socket.on("client-message", (message: string, event: "sendText" | "chat") => {
-    console.log(message);
     const string = JSON.stringify({
       event,
       success: undefined,

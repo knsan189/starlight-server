@@ -242,7 +242,7 @@ export default class LostarkService {
                   ItemName,
                   CategoryCode: num,
                   Sort: "GRADE",
-                  SortCondition: "ASC",
+                  SortCondition: "DESC",
                   PageSize: 5,
                 },
               }),
@@ -254,7 +254,7 @@ export default class LostarkService {
 
           responses.forEach((response) => {
             response.data.Items.forEach((item) => {
-              if (result.length <= 10) {
+              if (result.length < 8) {
                 result.push(item);
               }
             });

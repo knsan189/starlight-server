@@ -26,7 +26,7 @@ io.on("connection", (socket) => {
     });
 
     const buffer = Buffer.from(string);
-    udp.send(buffer, 4000, "knsan189.iptime.org");
+    udp.send(buffer, 4000, "127.0.0.1");
   });
 
   socket.on("remote-message", (msg) => {
@@ -49,7 +49,7 @@ udp.on("message", (msg, info) => {
     data: undefined,
   });
 
-  udp.send(Buffer.from(reply), 4000, "knsan189.iptime.org");
+  udp.send(Buffer.from(reply), 4000, "127.0.0.1");
   io.emit("server-message", {
     msg: data.text,
     sender: data.room,

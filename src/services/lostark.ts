@@ -197,6 +197,7 @@ export default class LostarkService {
             data: {
               ItemName,
               CategoryCode: 210000, // 보석 카테고리 코드
+              Sort: "BUY_PRICE",
             },
           });
 

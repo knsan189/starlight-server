@@ -110,3 +110,45 @@ interface Effect {
   Name: string;
   Description: string;
 }
+
+interface AuctionItem {
+  Name: string;
+  Grade: string;
+  Tier: number;
+  Level: number | null;
+  Icon: string;
+  GradeQuality: number | null;
+  AuctionInfo: {
+    StartPrice: number;
+    BuyPrice: number | null;
+    BidPrice: number;
+    EndDate: string;
+    BidCount: number;
+    /** 입찰가 */
+    BidStartPrice: number;
+    IsCompetitive: boolean;
+    TradeAllowCount: number;
+  };
+  Options: [
+    {
+      Type: string;
+      OptionName: string;
+      OptionNameTripod: string;
+      Value: number;
+      IsPenalty: false;
+      ClassName: string;
+    },
+  ];
+}
+
+interface MarketItem {
+  Id: number;
+  Name: string;
+  Grade: string;
+  Icon: string;
+  BundleCount: number;
+  TradeRemainCount: number | null;
+  YDayAvgPrice: number;
+  RecentPrice: number;
+  CurrentMinPrice: number;
+}

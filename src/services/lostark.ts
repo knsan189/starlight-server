@@ -1,4 +1,4 @@
-import axios, { AxiosResponse } from "axios";
+import axios, { AxiosPromise, AxiosResponse } from "axios";
 
 interface GetGuardiansRepsonse {
   Raids: GuardianRaid[];
@@ -15,6 +15,18 @@ interface GetUserResponse {
   cards: { Cards: Card[]; Effects: Effect[] } | null;
 }
 
+interface SearchAuctionResponse {
+  PageNo: number;
+  PageSize: number;
+  Items: AuctionItem[] | null;
+}
+
+interface SearchMarketResponse {
+  PageNo: number;
+  PageSize: number;
+  Items: MarketItem[];
+}
+
 type GetAbyssResponse = Abyss[];
 
 type GetCalendarResponse = Calendar[];
@@ -22,10 +34,7 @@ type GetCalendarResponse = Calendar[];
 const API_KEY =
   "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6IktYMk40TkRDSTJ5NTA5NWpjTWk5TllqY2lyZyIsImtpZCI6IktYMk40TkRDSTJ5NTA5NWpjTWk5TllqY2lyZyJ9.eyJpc3MiOiJodHRwczovL2x1ZHkuZ2FtZS5vbnN0b3ZlLmNvbSIsImF1ZCI6Imh0dHBzOi8vbHVkeS5nYW1lLm9uc3RvdmUuY29tL3Jlc291cmNlcyIsImNsaWVudF9pZCI6IjEwMDAwMDAwMDAxODc2MTQifQ.KBFhhv0IKI63gs0oVLoPHAfskMtBSEn5JbsjioMNaM-hSlwOuV2M0MGZVoQbSu8hOPbaJ7aILEenrrBnrI7oheuY78GVQxpriSujI4eyZtvnyq7-HEyQsHTBw3QBg4InWSVJGsvFFggIG9Z_Ce9QZsFVU_sHwTU2GN747CVA9TGt3KBfsIzqYdgAHRq6T1Y9GhCIfM84a-QGAjKss1C4hl83MiaVxDyJAArKLFzgg-2Y14PMiBXTT-6lvWCx0EGX3K1-DcJ3XIVPww-ud1_TVUDYz-YEB--itbcccY66o272xEhEapC5TJEQVl8djZ55-4v-Qnu_4qKyChxyu9hjcg";
 
-const resultMap = new Map<
-  "guardian-raids" | "abyss" | "calendar",
-  GetGuardiansRepsonse | GetAbyssResponse | { response: GetCalendarResponse; timeStamp: string }
->();
+const resultMap = new Map<string, any>();
 
 export default class LostarkService {
   private static instance = axios.create({
@@ -155,6 +164,104 @@ export default class LostarkService {
             gems: gems.data,
             cards: cards.data,
           });
+        } catch (error) {
+          reject(error);
+        }
+      })();
+    });
+  }
+
+  public static searchAuction(ItemName: string): Promise<SearchAuctionResponse> {
+    return new Promise((resolve, reject) => {
+      (async () => {
+        try {
+          const key = `auction-${ItemName}`;
+          const cache = resultMap.get(key) as {
+            timestamp: string;
+            response: SearchAuctionResponse;
+          };
+
+          if (cache) {
+            const before = new Date(cache.timestamp).getDate();
+            const now = new Date(cache.timestamp).getDate();
+            if (before === now) {
+              resolve(cache.response);
+              return;
+            }
+            resultMap.delete(key);
+          }
+
+          const response = await LostarkService.instance({
+            url: "/auctions/items",
+            method: "POST",
+            data: {
+              ItemName,
+              CategoryCode: 210000, // 보석 카테고리 코드
+            },
+          });
+
+          resultMap.set(key, { timestamp: new Date().toString(), response: response.data });
+          resolve(response.data);
+        } catch (error) {
+          reject(error);
+        }
+      })();
+    });
+  }
+
+  public static searchMarket(ItemName: string) {
+    return new Promise((resolve, reject) => {
+      (async () => {
+        try {
+          const key = `market-${ItemName}`;
+
+          const cache = resultMap.get(key) as {
+            timestamp: string;
+            response: MarketItem[];
+          };
+
+          if (cache) {
+            const before = new Date(cache.timestamp).getDate();
+            const now = new Date(cache.timestamp).getDate();
+            if (before === now) {
+              resolve(cache.response);
+              return;
+            }
+            resultMap.delete(key);
+          }
+
+          const categoryArr = [20000, 40000, 50000, 60000, 70000, 90000, 100000];
+          const promiseArr: AxiosPromise<SearchMarketResponse>[] = [];
+
+          categoryArr.forEach((num) => {
+            promiseArr.push(
+              LostarkService.instance({
+                url: "/markets/items",
+                method: "POST",
+                data: {
+                  ItemName,
+                  CategoryCode: num,
+                  Sort: "GRADE",
+                  SortCondition: "ASC",
+                  PageSize: 5,
+                },
+              }),
+            );
+          });
+
+          const result: MarketItem[] = [];
+          const responses = await Promise.all(promiseArr);
+
+          responses.forEach((response) => {
+            response.data.Items.forEach((item) => {
+              if (result.length <= 10) {
+                result.push(item);
+              }
+            });
+          });
+
+          resultMap.set(key, { timestamp: new Date().toString(), response: result });
+          resolve(result);
         } catch (error) {
           reject(error);
         }

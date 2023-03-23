@@ -90,4 +90,34 @@ LostarkRouter.get(
   },
 );
 
+LostarkRouter.post("/auction", async (req: Request<unknown, unknown, { keyword: string }>, res) => {
+  try {
+    const { keyword } = req.body;
+    if (!keyword) {
+      return res.status(400).send("Bad Request");
+    }
+    const response = await LostarkService.searchAuction(keyword);
+    return res.send(response);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send(error);
+  }
+});
+
+LostarkRouter.post("/market", async (req: Request<unknown, unknown, { keyword: string }>, res) => {
+  try {
+    const { keyword } = req.body;
+
+    if (!keyword) {
+      return res.status(400).send("Bad Request");
+    }
+
+    const response = await LostarkService.searchMarket(keyword);
+    return res.send(response);
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send(error);
+  }
+});
+
 export default LostarkRouter;

@@ -50,7 +50,8 @@ LostarkRouter.get("/calendar", async (req, res) => {
                 item.Name === "해적 주화" ||
                 item.Name === "골드" ||
                 item.Name.includes("카드 팩")) &&
-              item.StartTimes?.length,
+              item.StartTimes &&
+              item.StartTimes.some((time) => time.includes(today)),
           ).map((item) => ({
             ...item,
             StartTimes: item.StartTimes?.filter((time) => time.includes(today)) || [],

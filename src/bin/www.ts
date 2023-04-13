@@ -9,7 +9,7 @@ import app from "../app.js";
 import Debug from "debug";
 import * as http from "http";
 import process from "process";
-import { io } from "../src/socket.js";
+import { io } from "../socket.js";
 
 const debug = Debug("starlight:server");
 process.title = "starlightServer";

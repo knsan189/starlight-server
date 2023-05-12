@@ -32,7 +32,6 @@ export default class FortuneService {
           try {
             connection.query(`SELECT * FROM Fortune where id=${id}`, (err, result: Fortune[]) => {
               if (err) throw new Error(err.message);
-              if (!result[0]) throw new Error("운세 다 떨어짐");
               resolve(result[0]);
             });
           } catch (error) {

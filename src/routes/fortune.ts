@@ -55,8 +55,15 @@ FortuneRouter.get("/random", async (req, res) => {
       await shuffleFortuneArray();
       timeStamp = new Date();
     }
-    const index = fortuneIndexArray.shift() || 0;
-    const response = await FortuneService.getFortune(index);
+    let response: Fortune | undefined;
+
+    while (Boolean(!response?.fortune.length)) {
+      if (fortuneIndexArray.length === 0) {
+        await shuffleFortuneArray();
+      }
+      const index = fortuneIndexArray.shift() || 0;
+      response = await FortuneService.getFortune(index);
+    }
     return res.send(response);
   } catch (error) {
     console.log(error);

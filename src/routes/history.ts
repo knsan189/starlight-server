@@ -94,7 +94,7 @@ HistoryRouter.post("/sync", async (req: Request<unknown, unknown, SyncRequestBod
             time,
           };
           promiseArray.push(MemberService.editMember(history));
-          promiseArray.push(HistoryService.addHistory(history));
+          // promiseArray.push(HistoryService.addHistory(history));
         }
       }
     });

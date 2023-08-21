@@ -15,6 +15,7 @@ import HistoryRouter from "./routes/history.js";
 import MapRouter from "./routes/map.js";
 import LostarkRouter from "./routes/lostark.js";
 import { logConfig } from "./config/log.config.js";
+import { PUBLIC_PATH } from "./config/path.js";
 
 const isDev = `${process.env.NODE_ENV}`.trim() === "development";
 
@@ -31,7 +32,7 @@ app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, "../public")));
+app.use(express.static(PUBLIC_PATH));
 app.use("/api/map", MapRouter);
 app.use("/api/lostark", LostarkRouter);
 app.use("/api/history", HistoryRouter);

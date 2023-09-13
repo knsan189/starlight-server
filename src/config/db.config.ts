@@ -17,6 +17,8 @@ export const getConnection = (callback: (connection: PoolConnection) => void) =>
   pool.getConnection((error, connection) => {
     if (!error) {
       callback(connection);
+    } else {
+      console.error(error);
     }
   });
 };

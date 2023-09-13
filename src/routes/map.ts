@@ -65,7 +65,7 @@ MapRouter.get("/search", async (req: Request<unknown, unknown, unknown, SearchRe
       url: "http://api.vworld.kr/req/search",
       method: "GET",
       params: {
-        key: "252D4250-1B2B-3678-8E96-E545CC8A12B3",
+        key: "4450C4EB-47F4-3116-BA47-C6010C732ABE",
         type: "PLACE",
         query: keyword,
         request: "search",
@@ -136,7 +136,7 @@ MapRouter.get("/address", async (req: Request<unknown, unknown, unknown, Address
       params: {
         service: "address",
         verison: "2.0",
-        key: "7A323BF6-02C6-3043-A9A3-BFF984E9EBF7",
+        key: "4450C4EB-47F4-3116-BA47-C6010C732ABE",
         request: "GetAddress",
         type: "both",
         point,

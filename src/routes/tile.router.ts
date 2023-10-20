@@ -18,9 +18,6 @@ let source: CancelTokenSource;
 layers.forEach(({ type }) => {
   TileRouter.get(`/${type}/:z/:y/:x`, async (req, res) => {
     try {
-      if (source) {
-        source.cancel();
-      }
       source = CancelToken.source();
       const { z, y, x } = req.params;
       const dir = `${PUBLIC_PATH}/tileset/${type}`;

@@ -12,40 +12,48 @@ const VWORLD_KEY = "4450C4EB-47F4-3116-BA47-C6010C732ABE";
 
 const layers = [{ type: "Base" }, { type: "Satellite" }, { type: "Hybrid" }];
 
+const CancelToken = axios.CancelToken;
+const source = CancelToken.source();
+
 layers.forEach(({ type }) => {
   TileRouter.get(`/${type}/:z/:y/:x`, async (req, res) => {
-    const { z, y, x } = req.params;
-    const dir = `${PUBLIC_PATH}/tileset/${type}`;
-    const zdir = `${dir}/${z}`;
-    const ydir = `${dir}/${z}/${y}`;
-    const xdir = `${dir}/${z}/${y}/${x}`;
+    try {
+      const { z, y, x } = req.params;
+      const dir = `${PUBLIC_PATH}/tileset/${type}`;
+      const zdir = `${dir}/${z}`;
+      const ydir = `${dir}/${z}/${y}`;
+      const xdir = `${dir}/${z}/${y}/${x}`;
 
-    const response = await axios({
-      url: `http://api.vworld.kr/req/wmts/1.0.0/${VWORLD_KEY}/${type}/${z}/${y}/${x}`,
-      responseType: "stream",
-    });
+      const response = await axios({
+        url: `http://api.vworld.kr/req/wmts/1.0.0/${VWORLD_KEY}/${type}/${z}/${y}/${x}`,
+        responseType: "stream",
+        cancelToken: source.token,
+      });
 
-    if (!response.data) {
-      return res.status(404).send("not found");
+      if (!response.data) {
+        return res.status(404).send("not found");
+      }
+
+      if (!existsSync(dir)) {
+        mkdirSync(dir);
+      }
+
+      if (!existsSync(zdir)) {
+        mkdirSync(zdir);
+      }
+
+      if (!existsSync(ydir)) {
+        mkdirSync(ydir);
+      }
+
+      const writer = createWriteStream(xdir);
+      response.data.pipe(writer);
+      await finished(writer);
+      writer.destroy();
+      return res.send(readFileSync(xdir));
+    } catch (error) {
+      return res.status(500).send(error);
     }
-
-    if (!existsSync(dir)) {
-      mkdirSync(dir);
-    }
-
-    if (!existsSync(zdir)) {
-      mkdirSync(zdir);
-    }
-
-    if (!existsSync(ydir)) {
-      mkdirSync(ydir);
-    }
-
-    const writer = createWriteStream(xdir);
-    response.data.pipe(writer);
-    await finished(writer);
-    writer.destroy();
-    return res.send(readFileSync(xdir));
   });
 });
 

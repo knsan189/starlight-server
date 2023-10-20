@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { CancelTokenSource } from "axios";
 import { Router } from "express";
 import { createWriteStream, existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
 import { PUBLIC_PATH } from "../config/path.js";
@@ -13,11 +13,15 @@ const VWORLD_KEY = "4450C4EB-47F4-3116-BA47-C6010C732ABE";
 const layers = [{ type: "Base" }, { type: "Satellite" }, { type: "Hybrid" }];
 
 const CancelToken = axios.CancelToken;
-const source = CancelToken.source();
+let source: CancelTokenSource;
 
 layers.forEach(({ type }) => {
   TileRouter.get(`/${type}/:z/:y/:x`, async (req, res) => {
     try {
+      if (source) {
+        source.cancel();
+      }
+      source = CancelToken.source();
       const { z, y, x } = req.params;
       const dir = `${PUBLIC_PATH}/tileset/${type}`;
       const zdir = `${dir}/${z}`;

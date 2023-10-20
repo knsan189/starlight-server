@@ -44,6 +44,7 @@ layers.forEach(({ type }) => {
     const writer = createWriteStream(xdir);
     response.data.pipe(writer);
     await finished(writer);
+    writer.destroy();
     return res.send(readFileSync(xdir));
   });
 });

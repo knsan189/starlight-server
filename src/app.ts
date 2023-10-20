@@ -16,6 +16,7 @@ import MapRouter from "./routes/map.js";
 import LostarkRouter from "./routes/lostark.js";
 import { logConfig } from "./config/log.config.js";
 import { PUBLIC_PATH } from "./config/path.js";
+import TileRouter from "./routes/tile.router.js";
 
 const isDev = `${process.env.NODE_ENV}`.trim() === "development";
 
@@ -40,6 +41,7 @@ app.use("/api/island", islandRouter);
 app.use("/api/members", membersRouter);
 app.use("/api/raid", raidsRouter);
 app.use("/api/fortune", FortuneRouter);
+app.use("/tile", TileRouter);
 app.use("/*", IndexRouter);
 
 // catch 404 and forward to error handler
